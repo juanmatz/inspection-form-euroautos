@@ -86,6 +86,15 @@ try {
 // ---------------------------------------------------------
 $urls_fotos = [];
 
+// Obtener la placa limpia del vehículo para usarla como prefijo de los nombres de archivo
+$placa_vehiculo = 'SIN_PLACA';
+if (isset($data['datos_vehiculo']['placa'])) {
+    $placa_vehiculo = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $data['datos_vehiculo']['placa']));
+    if (empty($placa_vehiculo)) {
+        $placa_vehiculo = 'SIN_PLACA';
+    }
+}
+
 if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
     $num_files = count($_FILES['fotos']['tmp_name']);
     for ($i = 0; $i < $num_files; $i++) {
@@ -115,7 +124,11 @@ if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
 
         // C. Subir a Cloudinary usando REST API firmado (Mitigación RCE)
         $timestamp = time();
-        $params_to_sign = "folder=inspecciones&timestamp=" . $timestamp;
+        // Generar un public_id único con prefijo de la placa para evitar colisiones
+        $publicId = $placa_vehiculo . "_foto_" . ($i + 1) . "_" . bin2hex(random_bytes(3));
+
+        // Parámetros ordenados alfabéticamente para la firma (folder, public_id, timestamp)
+        $params_to_sign = "folder=inspecciones&public_id=" . $publicId . "&timestamp=" . $timestamp;
         $signature = sha1($params_to_sign . CLOUDINARY_API_SECRET);
 
         $cloudinary_url = "https://api.cloudinary.com/v1_1/" . CLOUDINARY_CLOUD_NAME . "/image/upload";
@@ -127,6 +140,7 @@ if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
             'file' => new CURLFile($tmpName, $mimeType, $fileName),
             'timestamp' => $timestamp,
             'folder' => 'inspecciones',
+            'public_id' => $publicId,
             'api_key' => CLOUDINARY_API_KEY,
             'signature' => $signature
         ]);

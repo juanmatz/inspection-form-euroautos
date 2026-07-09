@@ -1,10 +1,20 @@
 <?php
-// Buscar archivo .env en el directorio actual o en el superior (para mayor seguridad)
+// Buscar archivo .env en el directorio actual y en hasta 5 niveles superiores.
+// Esto permite mover .env fuera de public_html y seguir cargándolo.
 $envFile = '';
-if (file_exists(__DIR__ . '/.env')) {
-    $envFile = __DIR__ . '/.env';
-} elseif (file_exists(__DIR__ . '/../.env')) {
-    $envFile = __DIR__ . '/../.env';
+$dir = __DIR__;
+$maxLevels = 5;
+for ($level = 0; $level <= $maxLevels; $level++) {
+    $candidate = $dir . '/.env';
+    if (file_exists($candidate)) {
+        $envFile = $candidate;
+        break;
+    }
+    $parent = dirname($dir);
+    if ($parent === $dir) {
+        break;
+    }
+    $dir = $parent;
 }
 
 if (!empty($envFile)) {
