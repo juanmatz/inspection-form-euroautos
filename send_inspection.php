@@ -84,7 +84,51 @@ try {
 // ---------------------------------------------------------
 // 2. SUBIR FOTOS A CLOUDINARY
 // ---------------------------------------------------------
+// Conservar fotos previamente subidas si existen en el payload o en la base de datos
 $urls_fotos = [];
+if (isset($data['urls_fotos']) && is_array($data['urls_fotos'])) {
+    $urls_fotos = array_values(array_filter($data['urls_fotos']));
+} else if (isset($data['piezas']) && is_array($data['piezas']) && isset($data['piezas']['__urls_fotos__']) && is_array($data['piezas']['__urls_fotos__'])) {
+    $urls_fotos = array_values(array_filter($data['piezas']['__urls_fotos__']));
+}
+
+// Consultar la base de datos local para rescatar fotos anteriores del mismo UID
+if (isset($data['uid'])) {
+    try {
+        $connCheck = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if (!$connCheck->connect_error) {
+            $connCheck->set_charset(DB_CHARSET);
+            $stmtCheck = $connCheck->prepare("SELECT * FROM inspecciones_detalle WHERE uid = ? LIMIT 1");
+            if ($stmtCheck) {
+                $stmtCheck->bind_param("s", $data['uid']);
+                $stmtCheck->execute();
+                $resCheck = $stmtCheck->get_result();
+                if ($rowCheck = $resCheck->fetch_assoc()) {
+                    $existingDbUrls = [];
+                    if (!empty($rowCheck['urls_fotos'])) {
+                        if (is_string($rowCheck['urls_fotos'])) {
+                            $decoded = json_decode($rowCheck['urls_fotos'], true);
+                            if (is_array($decoded)) $existingDbUrls = $decoded;
+                        } else if (is_array($rowCheck['urls_fotos'])) {
+                            $existingDbUrls = $rowCheck['urls_fotos'];
+                        }
+                    }
+                    if (empty($existingDbUrls) && !empty($rowCheck['datos_json'])) {
+                        $pLocal = json_decode($rowCheck['datos_json'], true);
+                        if (isset($pLocal['__urls_fotos__']) && is_array($pLocal['__urls_fotos__'])) {
+                            $existingDbUrls = $pLocal['__urls_fotos__'];
+                        }
+                    }
+                    $urls_fotos = array_values(array_unique(array_filter(array_merge($urls_fotos, $existingDbUrls))));
+                }
+                $stmtCheck->close();
+            }
+            $connCheck->close();
+        }
+    } catch (Exception $e) {
+        // Ignorar error de DB local
+    }
+}
 
 // Obtener la placa limpia del vehículo para usarla como prefijo de los nombres de archivo
 $placa_vehiculo = 'SIN_PLACA';
@@ -164,8 +208,63 @@ if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
     }
 }
 
+// Limpiar y consolidar las URLs de fotos sin duplicados
+$urls_fotos = array_values(array_unique(array_filter($urls_fotos)));
+
 // Inyectar las URLs de las fotos en el payload definitivo para n8n
 $data['urls_fotos'] = $urls_fotos;
+
+// Guardar/Actualizar las URLs de fotos en la tabla local inspecciones_detalle
+try {
+    if (isset($data['uid'])) {
+        $uid = $data['uid'];
+        $piezas = isset($data['piezas']) ? $data['piezas'] : [];
+        if (is_array($piezas)) {
+            $piezas['__urls_fotos__'] = $urls_fotos;
+        }
+        $piezasJson = json_encode($piezas, JSON_UNESCAPED_UNICODE);
+        $obs = isset($data['observaciones']) ? trim($data['observaciones']) : '';
+        $timestamp = date('Y-m-d H:i:s');
+
+        $connDetalle = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+        if (!$connDetalle->connect_error) {
+            $connDetalle->set_charset(DB_CHARSET);
+            $urlsFotosJson = json_encode($urls_fotos, JSON_UNESCAPED_UNICODE);
+            
+            // 1. Intentar guardar en la columna urls_fotos
+            $sqlDetalle = "INSERT INTO inspecciones_detalle (uid, datos_json, observaciones, urls_fotos, ultima_actualizacion)
+                           VALUES (?, ?, ?, ?, ?)
+                           ON DUPLICATE KEY UPDATE
+                               datos_json           = VALUES(datos_json),
+                               observaciones        = VALUES(observaciones),
+                               urls_fotos           = VALUES(urls_fotos),
+                               ultima_actualizacion = VALUES(ultima_actualizacion)";
+            $stmtD = $connDetalle->prepare($sqlDetalle);
+            if ($stmtD) {
+                $stmtD->bind_param("sssss", $uid, $piezasJson, $obs, $urlsFotosJson, $timestamp);
+                $stmtD->execute();
+                $stmtD->close();
+            } else {
+                // Fallback por si la columna urls_fotos no existe aún en la tabla MySQL
+                $sqlFallback = "INSERT INTO inspecciones_detalle (uid, datos_json, observaciones, ultima_actualizacion)
+                                VALUES (?, ?, ?, ?)
+                                ON DUPLICATE KEY UPDATE
+                                    datos_json           = VALUES(datos_json),
+                                    observaciones        = VALUES(observaciones),
+                                    ultima_actualizacion = VALUES(ultima_actualizacion)";
+                $stmtF = $connDetalle->prepare($sqlFallback);
+                if ($stmtF) {
+                    $stmtF->bind_param("ssss", $uid, $piezasJson, $obs, $timestamp);
+                    $stmtF->execute();
+                    $stmtF->close();
+                }
+            }
+            $connDetalle->close();
+        }
+    }
+} catch (Exception $e) {
+    // Si ocurre algún problema en el guardado secundario local, no se interrumpe el flujo principal hacia n8n
+}
 
 // ---------------------------------------------------------
 // 3. ENVIAR A N8N
