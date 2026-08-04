@@ -690,6 +690,7 @@ class InspectionApp {
     this._confirmModal  = document.getElementById("confirm-modal");
     this._successModal  = document.getElementById("success-modal");
     this.fotos          = [];
+    this.existingFotos  = [];
   }
 
   async init() {
@@ -834,9 +835,10 @@ class InspectionApp {
     const countEl = document.getElementById("photo-count");
     if (!container || !grid || !countEl) return;
 
-    countEl.textContent = this.fotos.length;
+    const totalCount = this.fotos.length + this.existingFotos.length;
+    countEl.textContent = totalCount;
 
-    if (this.fotos.length === 0) {
+    if (totalCount === 0) {
       container.style.display = "none";
       grid.innerHTML = "";
       this._updateTopbarHeight();
@@ -846,9 +848,44 @@ class InspectionApp {
     container.style.display = "block";
     grid.innerHTML = "";
 
+    // 1. Renderizar fotos ya existentes en Cloudinary
+    this.existingFotos.forEach((url, index) => {
+      const item = document.createElement("div");
+      item.className = "photo-preview-item existing-photo";
+
+      const img = document.createElement("img");
+      img.src = url;
+
+      const btnRemove = document.createElement("button");
+      btnRemove.className = "btn-remove-photo";
+      btnRemove.innerHTML = "×";
+      btnRemove.title = "Eliminar foto";
+      btnRemove.addEventListener("click", () => this._removeExistingPhoto(index));
+
+      // Badge indicador de que está en Cloudinary
+      const badge = document.createElement("span");
+      badge.className = "photo-badge-cloud";
+      badge.innerHTML = '<i class="fas fa-cloud"></i>';
+      badge.style.position = "absolute";
+      badge.style.top = "4px";
+      badge.style.left = "4px";
+      badge.style.background = "rgba(40, 167, 69, 0.85)";
+      badge.style.color = "white";
+      badge.style.borderRadius = "3px";
+      badge.style.padding = "2px 4px";
+      badge.style.fontSize = "0.55rem";
+      badge.style.pointerEvents = "none";
+
+      item.appendChild(img);
+      item.appendChild(badge);
+      item.appendChild(btnRemove);
+      grid.appendChild(item);
+    });
+
+    // 2. Renderizar fotos nuevas capturadas localmente
     this.fotos.forEach((file, index) => {
       const item = document.createElement("div");
-      item.className = "photo-preview-item";
+      item.className = "photo-preview-item new-photo";
 
       const img = document.createElement("img");
       img.src = URL.createObjectURL(file);
@@ -870,6 +907,13 @@ class InspectionApp {
   _removePhoto(index) {
     this.fotos.splice(index, 1);
     this._renderPhotoPreviews();
+    this.saver.schedule();
+  }
+
+  _removeExistingPhoto(index) {
+    this.existingFotos.splice(index, 1);
+    this._renderPhotoPreviews();
+    this.saver.schedule();
   }
 
   _onUpdate(skipSave = false) {
@@ -912,6 +956,15 @@ class InspectionApp {
       if (!piezas) return;
       if (typeof piezas === "string") piezas = JSON.parse(piezas);
 
+      // Cargar fotos existentes del borrador
+      if (data.urls_fotos && Array.isArray(data.urls_fotos)) {
+        this.existingFotos = data.urls_fotos.filter(Boolean);
+      } else if (piezas && piezas.__urls_fotos__) {
+        this.existingFotos = piezas.__urls_fotos__;
+        delete piezas.__urls_fotos__;
+      }
+      this._renderPhotoPreviews();
+
       if (data.observaciones) {
         const el = document.getElementById("general-notes");
         if (el) el.value = data.observaciones;
@@ -937,6 +990,9 @@ class InspectionApp {
     this.cards.forEach(card => {
       Object.assign(piezas, card.toJSON());
     });
+    if (this.existingFotos && this.existingFotos.length > 0) {
+      piezas.__urls_fotos__ = this.existingFotos;
+    }
     return {
       uid: this.uid,
       piezas,
@@ -1000,6 +1056,7 @@ class InspectionApp {
       piezas,
       total_piezas: Object.keys(piezas).length,
       observaciones: document.getElementById("general-notes")?.value || "",
+      urls_fotos: this.existingFotos,
       datos_vehiculo: {
         placa:              document.getElementById("input-placa")?.value.trim(),
         marca:              document.getElementById("input-marca")?.value.trim(),
