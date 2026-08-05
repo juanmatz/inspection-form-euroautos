@@ -1048,6 +1048,79 @@ body.drawer-open .fab-send {
   background: #f87171;
 }
 
+/* ── DATOS FINALES MODAL ─────────────────────────────── */
+.final-field {
+  margin-bottom: 18px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border-radius: var(--radius-lg);
+}
+.final-field label {
+  display: flex;
+  align-items: center;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+.final-field label i {
+  color: var(--accent);
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+.final-input {
+  width: 100%;
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.final-input:focus {
+  border-color: var(--accent);
+}
+.ubicacion-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ubic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-3);
+  color: var(--text-2);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.ubic-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-dim);
+}
+.ubic-btn.selected {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow), inset 0 0 8px var(--accent-dim);
+}
+
 /* ── ASEGURADORA MODAL ─────────────────────────────── */
 .aseg-grid {
   display: grid;

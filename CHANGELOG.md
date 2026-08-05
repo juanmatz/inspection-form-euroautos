@@ -18,6 +18,21 @@
 ### Notas técnicas (opcional)
 ```
 
+## [4.4.0] — 2026-08-05
+
+### Archivos modificados
+- `index.html` — Se agregaron los inputs de "Kilometraje Actual" y "Ubicación del Vehículo" (botones En Taller / Por fuera) en el modal de confirmación final, ubicándolos de forma organizada junto con "Aseguradora". Se forzó purga de caché con la versión `4.3.2` y `4.3.1`.
+- `app.css` — Se añadieron estilos para la cuadrícula y los botones interactivos de "Ubicación", igualando su diseño premium al de los botones de la aseguradora (cambio a color naranja al hacer clic, con border y glow).
+- `app.js` — Se incluyó validación de datos para hacer obligatorios el kilometraje y la ubicación antes de enviar la inspección. Se adjuntaron las variables `kilometraje`, `ubicacion` y `aseguradora` al objeto `payload` principal.
+- `send_inspection.php` — Se actualizó el query `UPDATE inspecciones` para registrar directamente el kilometraje (como `INT`) y la ubicación en la base de datos. Se inyectaron estas variables en el `$n8nPayload` enviado al Webhook de n8n.
+- `pdf_template.php` — Se amplió la cuadrícula CSS superior (`.header-data`) de dos a tres filas, insertando dinámicamente las variables de kilometraje y ubicación en el PDF oficial generado.
+
+### Cambios
+- **1. Nuevos Datos Obligatorios al Finalizar:**
+  - El operario no puede finalizar y enviar una inspección sin antes especificar la aseguradora, el kilometraje actual del vehículo y su ubicación física (En taller / Por fuera).
+- **2. Integración Extremo a Extremo (Base de Datos + PDF + n8n):**
+  - Los datos añadidos no solo figuran en la base de datos local y en el campo general de `datos_json`, sino que ahora aparecen correctamente formateados en la cabecera del documento PDF y llegan estructurados al nodo Gatekeeper de n8n para su posterior envío automatizado (Telegram, Correo, etc.).
+
 ## [4.3.1] — 2026-08-04
 
 ### Archivos modificados
@@ -30,7 +45,8 @@
 ## [4.3.0] — 2026-08-04
 
 ### Archivos modificados
-- `send_inspection.php` — Se eliminó la subida del reporte PDF a Cloudinary. Ahora el PDF generado se guarda localmente en el servidor (`/reportes_pdf/`) y se envía la URL pública de este archivo a n8n. Cloudinary queda reservado exclusivamente para la subida de fotografías divididas en subcarpetas por vehículo.
+- `send_inspection.php` — Se eliminó la subida del reporte PDF a Cloudinary. Ahora el PDF generado se guarda localmente en el servidor (`/reportes_pdf/`) y se envía la 
+URL pública de este archivo a n8n. Cloudinary queda reservado exclusivamente para la subida de fotografías divididas en subcarpetas por vehículo.
 
 ---
 

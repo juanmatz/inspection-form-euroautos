@@ -25,8 +25,8 @@
  *   Fila de categoría: <tr class="cat-header"><td colspan="4">NOMBRE CATEGORIA</td></tr>
  *   Fila de datos:     <tr class="data-row">
  *                        <td class="piece-name">Pieza</td>
- *                        <td><span class="badge b-FUERTE">FUERTE</span></td>
  *                        <td class="pos-cell">Delantero Izquierdo</td>
+ *                        <td><span class="badge b-FUERTE">FUERTE</span></td>
  *                        <td class="nota-cell">nota opcional</td>
  *                      </tr>
  */
@@ -140,9 +140,9 @@ body {
   border-bottom: 1px solid #D3D8E8;
 }
 
-/* Bordes para la grilla (Fila 1 tiene 4 ítems, Fila 2 tiene 3 ítems) */
-.hd-item:nth-child(4), .hd-item:nth-child(7) { border-right: none; }
-.hd-item:nth-child(n+5) { border-bottom: none; }
+/* Bordes para la grilla (Fila 1: 4 ítems, Fila 2: 3 ítems, Fila 3: 2 ítems) */
+.hd-item:nth-child(4), .hd-item:nth-child(7), .hd-item:nth-child(9) { border-right: none; }
+.hd-item:nth-child(n+8) { border-bottom: none; }
 
 /* Asignación de columnas (6 en total) */
 .hd-prop { grid-column: span 2; }
@@ -153,6 +153,9 @@ body {
 .hd-col  { grid-column: span 2; }
 .hd-vin  { grid-column: span 2; }
 .hd-aseg { grid-column: span 2; }
+
+.hd-km   { grid-column: span 3; }
+.hd-ubic { grid-column: span 3; }
 
 .hd-label {
   font-size: 8px; color: #6b7280;
@@ -211,8 +214,8 @@ body {
 
 /* Anchos de columna (4 columnas) */
 .items-table th:nth-child(1) { width: 26%; }
-.items-table th:nth-child(2) { width: 32%; }
-.items-table th:nth-child(3) { width: 22%; }
+.items-table th:nth-child(2) { width: 22%; }
+.items-table th:nth-child(3) { width: 32%; }
 .items-table th:nth-child(4) { width: 20%; }
 
 /* Fila de categoría */
@@ -339,6 +342,14 @@ body {
       <span class="hd-label">Aseguradora</span>
       <span class="hd-value"><?= htmlspecialchars($aseguradoraEsc, ENT_QUOTES) ?></span>
     </div>
+    <div class="hd-item hd-km">
+      <span class="hd-label">Kilometraje</span>
+      <span class="hd-value"><?= htmlspecialchars($kilometrajeEsc, ENT_QUOTES) ?></span>
+    </div>
+    <div class="hd-item hd-ubic">
+      <span class="hd-label">Ubicación</span>
+      <span class="hd-value"><?= htmlspecialchars($ubicacionEsc, ENT_QUOTES) ?></span>
+    </div>
   </div>
 </div>
 
@@ -356,8 +367,8 @@ body {
     <thead>
       <tr>
         <th>Pieza</th>
-        <th>Tipo de Reparación</th>
         <th>Posición</th>
+        <th>Tipo de Reparación</th>
         <th>Notas Técnicas</th>
       </tr>
     </thead>

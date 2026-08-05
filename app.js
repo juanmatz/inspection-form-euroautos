@@ -1087,6 +1087,9 @@ class InspectionApp {
       total_piezas: Object.keys(piezas).length,
       observaciones: document.getElementById("general-notes")?.value || "",
       urls_fotos: this.existingFotos,
+      aseguradora: this.aseguradora,
+      kilometraje: this.kilometraje,
+      ubicacion: this.ubicacion,
       datos_vehiculo: {
         placa:              document.getElementById("input-placa")?.value.trim(),
         marca:              document.getElementById("input-marca")?.value.trim(),
@@ -1100,7 +1103,12 @@ class InspectionApp {
     };
 
     const formData = new FormData();
-    formData.append("datos", JSON.stringify({ ...payload, aseguradora: this.aseguradora || "" }));
+    formData.append("datos", JSON.stringify({ 
+      ...payload, 
+      aseguradora: this.aseguradora || "",
+      kilometraje: this.kilometraje || "",
+      ubicacion: this.ubicacion || ""
+    }));
     this.fotos.forEach(file => {
       formData.append("fotos[]", file);
     });
@@ -1269,12 +1277,30 @@ class InspectionApp {
         if (errEl) errEl.style.display = "none";
       });
     });
+
+    // Botones del modal de ubicación
+    document.querySelectorAll(".ubic-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.ubicacion = btn.dataset.value;
+        document.querySelectorAll(".ubic-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        const errEl = document.getElementById("aseg-error");
+        if (errEl) errEl.style.display = "none";
+      });
+    });
+
+    // Limpiar campos al abrir el modal (opcional, o dejarlos si ya se ingresaron)
+    // Se maneja desde openAseguradoraModal normalmente, pero aquí capturamos:
     document.getElementById("btn-confirm-aseg")?.addEventListener("click", () => {
-      if (!this.aseguradora) {
+      const kmInput = document.getElementById("input-kilometraje")?.value.trim();
+      
+      if (!this.aseguradora || !this.ubicacion || !kmInput) {
         const errEl = document.getElementById("aseg-error");
         if (errEl) errEl.style.display = "flex";
         return;
       }
+      
+      this.kilometraje = kmInput;
       this.closeAseguradoraModal();
       this.openConfirm();
     });
