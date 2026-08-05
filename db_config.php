@@ -49,4 +49,6 @@ if (!defined('API_KEY'))                  define('API_KEY', '@Euro2026*@_');
 if (!defined('CLOUDINARY_CLOUD_NAME'))    define('CLOUDINARY_CLOUD_NAME', 'tu_cloud_name');
 if (!defined('CLOUDINARY_API_KEY'))       define('CLOUDINARY_API_KEY', 'tu_api_key');
 if (!defined('CLOUDINARY_API_SECRET'))    define('CLOUDINARY_API_SECRET', 'tu_api_secret');
+if (!defined('BROWSERLESS_URL'))          define('BROWSERLESS_URL', '');
+if (!defined('BROWSERLESS_TOKEN'))        define('BROWSERLESS_TOKEN', '');
 ?>

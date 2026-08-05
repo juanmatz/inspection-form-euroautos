@@ -683,14 +683,16 @@ class SummaryPanel {
 class InspectionApp {
   constructor() {
     this.uid     = "";
-    this.cards   = new Map(); // baseKey -> PartCard
+    this.cards   = new Map();
     this.panel   = new SummaryPanel();
     this.saver   = new AutoSaver(() => this._draftPayload());
-    this._notesModal    = document.getElementById("notes-modal");
-    this._confirmModal  = document.getElementById("confirm-modal");
-    this._successModal  = document.getElementById("success-modal");
-    this.fotos          = [];
-    this.existingFotos  = [];
+    this._notesModal       = document.getElementById("notes-modal");
+    this._confirmModal     = document.getElementById("confirm-modal");
+    this._successModal     = document.getElementById("success-modal");
+    this._aseguradoraModal = document.getElementById("aseguradora-modal");
+    this.fotos             = [];
+    this.existingFotos     = [];
+    this.aseguradora       = null; // Valor seleccionado: Allianz | HDI | Mapfre | Personal
   }
 
   async init() {
@@ -946,8 +948,8 @@ class InspectionApp {
   // ── Draft ─────────────────────────────────────────────────────
   async _loadDraft(id) {
     try {
-      const res = await fetch(`get_draft.php?id=${id}`);
-      if (!res.ok) return;
+      const res = await fetch(`get_draft.php?id=${id}`).catch(() => null);
+      if (!res || !res.ok) return;
       const text = await res.text();
       if (!text.trim()) return;
       let data = JSON.parse(text);
@@ -1004,6 +1006,34 @@ class InspectionApp {
   toggleNotes() {
     if (!this._notesModal) return;
     this._notesModal.classList.toggle("open");
+  }
+
+  // ── Aseguradora modal ───────────────────────────────────
+  openAseguradoraModal() {
+    // Verificar que haya al menos una pieza antes de abrir
+    const items = [];
+    this.cards.forEach(card => {
+      card.instances.forEach(inst => {
+        if (inst.hasData || inst.sideSelector.active.size > 0) items.push(inst);
+      });
+    });
+    if (items.length === 0) {
+      this._toast("Agrega al menos una pieza antes de enviar", "error");
+      return;
+    }
+
+    // Restaurar estado visual de selección previa
+    document.querySelectorAll(".aseg-btn").forEach(btn => {
+      btn.classList.toggle("selected", btn.dataset.value === this.aseguradora);
+    });
+    const errEl = document.getElementById("aseg-error");
+    if (errEl) errEl.style.display = "none";
+
+    if (this._aseguradoraModal) this._aseguradoraModal.classList.add("open");
+  }
+
+  closeAseguradoraModal() {
+    if (this._aseguradoraModal) this._aseguradoraModal.classList.remove("open");
   }
 
   // ── Confirm & send ────────────────────────────────────────────
@@ -1070,7 +1100,7 @@ class InspectionApp {
     };
 
     const formData = new FormData();
-    formData.append("datos", JSON.stringify(payload));
+    formData.append("datos", JSON.stringify({ ...payload, aseguradora: this.aseguradora || "" }));
     this.fotos.forEach(file => {
       formData.append("fotos[]", file);
     });
@@ -1099,26 +1129,27 @@ class InspectionApp {
     const titleEl = document.getElementById("sw-title");
     const descEl = document.getElementById("sw-desc");
     const btn = document.getElementById("sw-action-btn");
+    const closeBtn = document.getElementById("sw-close-btn");
 
     if (!widget || !iconContainer || !titleEl || !descEl || !btn) return;
 
     widget.className = "send-status-widget open " + state;
 
+    const placa = document.getElementById("input-placa")?.value.trim() || "—";
+    const aseguradora = this.aseguradora || "N/A";
+
     if (state === "sending") {
       iconContainer.innerHTML = '<i class="fas fa-paper-plane sw-sending-icon"></i>';
       titleEl.textContent = "Enviando Inspección...";
-      descEl.textContent = "Generando PDF y enviando a Telegram. Puedes seguir trabajando.";
+      descEl.innerHTML = `<strong>Placa:</strong> ${placa} &nbsp;·&nbsp; <strong>Aseguradora:</strong> ${aseguradora}`;
       btn.style.display = "none";
     } 
     else if (state === "success") {
       iconContainer.innerHTML = '<i class="fas fa-check"></i>';
       titleEl.textContent = "¡Enviado con Éxito!";
-      descEl.textContent = "El PDF ha sido generado y enviado a Telegram correctamente.";
-      btn.textContent = "Nueva";
-      btn.style.display = "block";
-      btn.onclick = () => {
-        location.reload();
-      };
+      descEl.innerHTML = `<strong>${placa} (${aseguradora})</strong> — Reporte enviado a Telegram.`;
+      // Se oculta el botón "Nueva" a petición del usuario
+      btn.style.display = "none";
     } 
     else if (state === "error") {
       iconContainer.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
@@ -1126,8 +1157,12 @@ class InspectionApp {
       descEl.textContent = extraInfo || "Error de comunicación. Intenta nuevamente.";
       btn.textContent = "Reintentar";
       btn.style.display = "block";
-      btn.onclick = () => {
-        this.submitFinal();
+      btn.onclick = () => this.submitFinal();
+    }
+
+    if (closeBtn) {
+      closeBtn.onclick = () => {
+        widget.classList.remove("open");
       };
     }
   }
@@ -1188,6 +1223,7 @@ class InspectionApp {
   _openDrawer() {
     document.getElementById("drawer")?.classList.add("open");
     document.getElementById("drawer-overlay")?.classList.add("open");
+    document.body.classList.add("drawer-open");
     // sync drawer body with panel body
     const panelBody = document.getElementById("panel-body");
     const drawerBody = document.getElementById("drawer-body");
@@ -1197,6 +1233,7 @@ class InspectionApp {
   _closeDrawer() {
     document.getElementById("drawer")?.classList.remove("open");
     document.getElementById("drawer-overlay")?.classList.remove("open");
+    document.body.classList.remove("drawer-open");
   }
 
   _bindGlobalActions() {
@@ -1216,10 +1253,33 @@ class InspectionApp {
       location.reload();
     });
 
-    // Send buttons (panel, FAB, drawer)
-    document.getElementById("btn-send")?.addEventListener("click", () => this.openConfirm());
-    document.getElementById("fab-send")?.addEventListener("click", () => this.openConfirm());
-    document.getElementById("btn-send-drawer")?.addEventListener("click", () => { this._closeDrawer(); this.openConfirm(); });
+    // Send buttons (panel, FAB, drawer, topbar) → pasan por el modal de aseguradora
+    document.getElementById("btn-send")?.addEventListener("click", () => this.openAseguradoraModal());
+    document.getElementById("fab-send")?.addEventListener("click", () => this.openAseguradoraModal());
+    document.getElementById("btn-topbar-send")?.addEventListener("click", () => this.openAseguradoraModal());
+    document.getElementById("btn-send-drawer")?.addEventListener("click", () => { this._closeDrawer(); this.openAseguradoraModal(); });
+
+    // Botones del modal de aseguradora
+    document.querySelectorAll(".aseg-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.aseguradora = btn.dataset.value;
+        document.querySelectorAll(".aseg-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        const errEl = document.getElementById("aseg-error");
+        if (errEl) errEl.style.display = "none";
+      });
+    });
+    document.getElementById("btn-confirm-aseg")?.addEventListener("click", () => {
+      if (!this.aseguradora) {
+        const errEl = document.getElementById("aseg-error");
+        if (errEl) errEl.style.display = "flex";
+        return;
+      }
+      this.closeAseguradoraModal();
+      this.openConfirm();
+    });
+    document.getElementById("btn-cancel-aseg")?.addEventListener("click", () => this.closeAseguradoraModal());
+    document.getElementById("close-aseg")?.addEventListener("click", () => this.closeAseguradoraModal());
 
     // Mobile drawer
     document.getElementById("mobile-panel-btn")?.addEventListener("click", () => this._openDrawer());
