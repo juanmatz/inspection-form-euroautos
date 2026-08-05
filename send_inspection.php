@@ -59,10 +59,15 @@ try {
         }
         $stmtV->close();
 
-        // B. Vincular placa a la inspección
-        $sqlInsp = "UPDATE inspecciones SET placa = ? WHERE uid = ?";
+        $kmStr = trim($data['kilometraje'] ?? '');
+        $kmVal = ($kmStr !== '') ? intval($kmStr) : null;
+        $ubStr = trim($data['ubicacion'] ?? '');
+        $ubVal = ($ubStr !== '') ? $ubStr : null;
+
+        // B. Vincular placa, kilometraje y ubicacion a la inspección
+        $sqlInsp = "UPDATE inspecciones SET placa = ?, kilometraje = ?, ubicacion = ? WHERE uid = ?";
         $stmtI = $conn->prepare($sqlInsp);
-        $stmtI->bind_param("ss", $placa, $uid);
+        $stmtI->bind_param("siss", $placa, $kmVal, $ubVal, $uid);
         if (!$stmtI->execute()) {
             throw new Exception("Error actualizando inspección: " . $stmtI->error);
         }
@@ -224,6 +229,8 @@ $vehiculo      = $data['datos_vehiculo'] ?? [];
 $piezasRaw     = $data['piezas'] ?? [];
 $observaciones = trim($data['observaciones'] ?? '');
 $aseguradora   = trim($data['aseguradora'] ?? '');
+$kilometraje   = trim($data['kilometraje'] ?? '');
+$ubicacion     = trim($data['ubicacion'] ?? '');
 $fechaHoy      = date('d/m/Y');
 
 // Mapa de posiciones
@@ -306,8 +313,8 @@ foreach ($categorias as $catName => $piezasObj) {
                 $filasHtml .= "
         <tr class=\"data-row\">
           <td class=\"piece-name\">{$pieceNameEsc}</td>
-          <td><span class=\"badge {$badge['class']}\">{$badge['label']}</span></td>
           <td class=\"pos-cell\">{$posEsc}</td>
+          <td><span class=\"badge {$badge['class']}\">{$badge['label']}</span></td>
           <td class=\"nota-cell\">{$notaHtml}</td>
         </tr>";
             }
@@ -337,6 +344,8 @@ $vin            = htmlspecialchars($vehiculo['vin']                ?? 'N/A', ENT
 $propietario    = htmlspecialchars($vehiculo['propietario']        ?? 'N/A', ENT_QUOTES);
 $cedula         = htmlspecialchars($vehiculo['cedula_propietario'] ?? 'N/A', ENT_QUOTES);
 $aseguradoraEsc = htmlspecialchars($aseguradora ?: 'N/A',           ENT_QUOTES);
+$kilometrajeEsc = htmlspecialchars($kilometraje ?: 'N/A',           ENT_QUOTES);
+$ubicacionEsc   = htmlspecialchars($ubicacion ?: 'N/A',             ENT_QUOTES);
 
 require_once __DIR__ . '/pdf_template.php';
 
@@ -350,6 +359,8 @@ $htmlReporte = generarHtmlReporte([
     'color'          => $color,
     'vin'            => $vin,
     'aseguradoraEsc' => $aseguradoraEsc,
+    'kilometrajeEsc' => $kilometrajeEsc,
+    'ubicacionEsc'   => $ubicacionEsc,
     'totalPiezas'    => $totalPiezas,
     'filasHtml'      => $filasHtml,
     'obsHtml'        => $obsHtml,
@@ -427,6 +438,8 @@ $n8nPayload = json_encode([
     'pdf_url'       => $pdf_url,
     'urls_fotos'    => $urls_fotos,
     'aseguradora'   => $aseguradora,
+    'kilometraje'   => $kilometraje,
+    'ubicacion'     => $ubicacion,
     'datos_vehiculo'=> $data['datos_vehiculo'] ?? [],
     'observaciones' => $data['observaciones'] ?? '',
     'total_piezas'  => $totalPiezas,
