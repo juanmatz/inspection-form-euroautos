@@ -7,7 +7,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Inspección Técnica — Euro Autos</title>
-  <link rel="stylesheet" href="app.css?v=3.0.0" />
+  <link rel="stylesheet" href="app.css?v=4.1.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -55,6 +55,10 @@
       <!-- Toggle datos vehículo -->
       <button class="btn-icon" id="btn-toggle-vh" title="Datos del vehículo">
         <i class="fas fa-chevron-down" id="toggle-vh-icon"></i>
+      </button>
+      <!-- Botón Enviar con chulo naranja (esquina superior derecha) -->
+      <button class="btn-topbar-send" id="btn-topbar-send" title="Enviar Inspección">
+        <i class="fas fa-check"></i> <span>ENVIAR</span>
       </button>
     </div>
   </div>
@@ -247,6 +251,45 @@
   </div>
 </div>
 
+<!-- MODAL: SELECCIÓN DE ASEGURADORA (obligatorio antes del envío) -->
+<div class="modal-overlay" id="aseguradora-modal">
+  <div class="modal-box" style="max-width:400px;">
+    <div class="modal-head">
+      <h3><i class="fas fa-shield-halved"></i> Aseguradora</h3>
+      <button class="btn-close-modal" id="close-aseg">×</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:16px;">
+        Selecciona la aseguradora del vehículo antes de continuar.
+        <strong style="color:var(--accent);">Campo obligatorio.</strong>
+      </p>
+      <div class="aseg-grid" id="aseg-grid">
+        <button class="aseg-btn" id="aseg-Allianz" data-value="Allianz">
+          <i class="fas fa-building"></i> Allianz
+        </button>
+        <button class="aseg-btn" id="aseg-HDI" data-value="HDI">
+          <i class="fas fa-building"></i> HDI
+        </button>
+        <button class="aseg-btn" id="aseg-Mapfre" data-value="Mapfre">
+          <i class="fas fa-building"></i> Mapfre
+        </button>
+        <button class="aseg-btn" id="aseg-Personal" data-value="Personal">
+          <i class="fas fa-user"></i> Personal
+        </button>
+      </div>
+      <div class="aseg-error" id="aseg-error" style="display:none;">
+        <i class="fas fa-exclamation-circle"></i> Debes seleccionar una aseguradora para continuar.
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="btn-cancel-aseg">Cancelar</button>
+      <button class="btn-primary" id="btn-confirm-aseg">
+        <i class="fas fa-arrow-right"></i> Continuar
+      </button>
+    </div>
+  </div>
+</div>
+
 <!-- WIDGET FLOTANTE DE ENVÍO -->
 <div class="send-status-widget" id="send-status-widget">
   <div class="sw-body">
@@ -258,11 +301,12 @@
       <div class="sw-desc" id="sw-desc">Generando PDF y enviando a Telegram.</div>
     </div>
     <button class="sw-btn" id="sw-action-btn" style="display:none;">Nueva</button>
+    <button class="sw-close-btn" id="sw-close-btn" title="Cerrar notificación">×</button>
   </div>
 </div>
 
 <div class="toast-container" id="toast-container"></div>
 
-<script src="app.js?v=3.0.1"></script>
+<script src="app.js?v=4.3.0"></script>
 </body>
 </html>
