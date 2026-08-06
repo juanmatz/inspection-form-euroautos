@@ -18,6 +18,19 @@
 ### Notas técnicas (opcional)
 ```
 
+## [4.5.0] — 2026-08-05
+
+### Archivos modificados
+- `index.html` — Se removió el atributo `capture="environment"` del input de captura de fotos para permitir la selección desde la galería. Se añadió la estructura HTML para el modal de "Nota de Foto" y se forzó la purga de caché con la versión `4.4.0`.
+- `app.css` — Se agregaron estilos `.btn-note-photo` para renderizar un botón con ícono de comentario encima de cada miniatura de fotografía. Se diseñó también la clase `.has-note` para pintar de naranja el botón cuando la foto tiene una nota.
+- `app.js` — Se actualizó la lógica de previsualización de fotos (`_renderPhotoPreviews`) para mostrar el botón de notas. Se creó un diccionario `this.fotoNotes` y eventos del modal para guardar temporalmente las descripciones de las imágenes. El `submitFinal` ahora adjunta un arreglo de objetos y nuevos parámetros al `FormData`.
+- `send_inspection.php` — Se modificó el parseo de `urls_fotos` para que la base de datos MySQL ahora almacene un arreglo de objetos `[{"url": "...", "nota": "..."}]` en lugar de strings simples, procesando las `notas_fotos_nuevas` inyectadas en la petición POST.
+- `save_draft.php` — Se reescribió la función `array_unique` en PHP para soportar el nuevo formato JSON de objetos y evitar que el autoguardado se rompa con errores de conversión a string.
+
+### Cambios
+- **Selección de Galería:** Los operarios ahora pueden subir imágenes preexistentes desde la galería de su celular de forma fluida.
+- **Notas Individuales en Fotos:** Se implementó una interfaz que permite añadir texto descriptivo debajo de cada fotografía para indicar detalles particulares de la pieza (abolladuras, rayones, etc.). Esta información ahora viaja estructurada hasta n8n.
+
 ## [4.4.0] — 2026-08-05
 
 ### Archivos modificados

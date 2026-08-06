@@ -1047,6 +1047,33 @@ body.drawer-open .fab-send {
 .btn-remove-photo:hover {
   background: #f87171;
 }
+.btn-note-photo {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text-2);
+  border: 1px solid var(--border-2);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: all 0.15s;
+}
+.btn-note-photo:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn-note-photo.has-note {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
 
 /* ── DATOS FINALES MODAL ─────────────────────────────── */
 .final-field {

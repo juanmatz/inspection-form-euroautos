@@ -88,6 +88,12 @@ if (isset($data['urls_fotos']) && is_array($data['urls_fotos'])) {
     $urls_fotos = array_values(array_filter($data['urls_fotos']));
 }
 
+// Asegurar que $urls_fotos sea un arreglo de objetos {url, nota}
+foreach ($urls_fotos as &$f) {
+    if (is_string($f)) $f = ['url' => $f, 'nota' => ''];
+}
+unset($f);
+
 // Rescatar fotos anteriores del mismo UID desde la BD local
 if (isset($data['uid'])) {
     try {
@@ -111,7 +117,23 @@ if (isset($data['uid'])) {
                             $existingDbUrls = $pLocal['__urls_fotos__'];
                         }
                     }
-                    $urls_fotos = array_values(array_unique(array_filter(array_merge($urls_fotos, $existingDbUrls))));
+                    
+                    // Asegurar formato {url, nota} para existingDbUrls
+                    foreach ($existingDbUrls as &$f) {
+                        if (is_string($f)) $f = ['url' => $f, 'nota' => ''];
+                    }
+                    unset($f);
+                    
+                    // Combinar ambos arrays evitando duplicados por URL
+                    $merged = array_merge($urls_fotos, $existingDbUrls);
+                    $unique = [];
+                    foreach ($merged as $item) {
+                        if (!isset($item['url']) || empty($item['url'])) continue;
+                        if (!isset($unique[$item['url']])) {
+                            $unique[$item['url']] = $item;
+                        }
+                    }
+                    $urls_fotos = array_values($unique);
                 }
                 $stmtCheck->close();
             }
@@ -174,7 +196,11 @@ if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
         if ($http_code_cloud >= 200 && $http_code_cloud < 300) {
             $data_cloud = json_decode($res_cloud, true);
             if (isset($data_cloud['secure_url'])) {
-                $urls_fotos[] = $data_cloud['secure_url'];
+                $nota = isset($_POST['notas_fotos_nuevas'][$i]) ? trim($_POST['notas_fotos_nuevas'][$i]) : '';
+                $urls_fotos[] = [
+                    'url' => $data_cloud['secure_url'],
+                    'nota' => $nota
+                ];
             }
         } else {
             $err_cloud = json_decode($res_cloud, true);
@@ -186,7 +212,15 @@ if (isset($_FILES['fotos']) && is_array($_FILES['fotos']['tmp_name'])) {
     }
 }
 
-$urls_fotos = array_values(array_unique(array_filter($urls_fotos)));
+// Evitar duplicados por URL al final
+$unique = [];
+foreach ($urls_fotos as $item) {
+    if (!isset($item['url']) || empty($item['url'])) continue;
+    if (!isset($unique[$item['url']])) {
+        $unique[$item['url']] = $item;
+    }
+}
+$urls_fotos = array_values($unique);
 $data['urls_fotos'] = $urls_fotos;
 
 // ─────────────────────────────────────────────────────────────────
