@@ -424,42 +424,6 @@ html, body {
 .ab-DESMONTAJE_MONTAJE { background: rgba(251,146,60,0.15); color: var(--act-dm); }
 .ab-REVISION { background: rgba(148,163,184,0.15); color: var(--act-rev); }
 
-/* ── FAB — botón flotante siempre visible ────────────────────── */
-.fab-send {
-  display: none;
-  position: fixed !important;
-  bottom: 16px !important;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-  right: 20px !important;
-  z-index: 9999 !important;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #f97316, #ea580c) !important;
-  color: #ffffff !important;
-  border: 2px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 30px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.5px;
-  padding: 13px 24px;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.65), 0 0 0 1px rgba(249, 115, 22, 0.4) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  pointer-events: auto !important;
-}
-.fab-send:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.75) !important; }
-.fab-send:active { transform: scale(0.94); }
-
-/* Ocultar el FAB flotante cuando el drawer móvil esté abierto, cuando hay un modal activo o cuando el teclado está abierto (input/textarea focus) para evitar solapamientos */
-body.drawer-open .fab-send,
-body.modal-open .fab-send,
-body:has(.modal-overlay.open) .fab-send,
-body:has(input:focus) .fab-send,
-body:has(textarea:focus) .fab-send {
-  display: none !important;
-}
 
 /* ── DRAWER (móvil) ──────────────────────────────────────────── */
 .drawer-overlay {
@@ -1329,14 +1293,12 @@ body:has(textarea:focus) .fab-send {
 @media (max-width: 1024px) and (min-width: 768px) {
   .side-panel { display: flex !important; width: 230px; }
   .parts-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
-  .fab-send { display: none !important; }
   .mobile-panel-btn { display: none !important; }
 }
 
 /* ── RESPONSIVO: MÓVIL (< 768px) ─────────────────────────── */
 @media (max-width: 767px) {
   .side-panel { display: none !important; }
-  .fab-send { display: flex !important; }
   .mobile-panel-btn { display: flex !important; }
   .parts-area { padding-bottom: 120px; }
   .parts-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
@@ -1348,14 +1310,6 @@ body:has(textarea:focus) .fab-send {
   .brand-name { display: none; }
   .vs-desc { display: none; }
   .topbar-main { padding: 6px 10px; gap: 6px; }
-
-  .fab-send {
-    bottom: 16px !important;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-    right: 16px !important;
-    padding: 11px 20px;
-    font-size: 0.95rem;
-  }
 
   .send-status-widget {
     top: auto;

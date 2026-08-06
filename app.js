@@ -1340,9 +1340,8 @@ class InspectionApp {
       location.reload();
     });
 
-    // Send buttons (panel, FAB, drawer, topbar) → pasan por el modal de aseguradora
+    // Send buttons (panel, drawer, topbar) → pasan por el modal de aseguradora
     document.getElementById("btn-send")?.addEventListener("click", () => this.openAseguradoraModal());
-    document.getElementById("fab-send")?.addEventListener("click", () => this.openAseguradoraModal());
     document.getElementById("btn-topbar-send")?.addEventListener("click", () => this.openAseguradoraModal());
     document.getElementById("btn-send-drawer")?.addEventListener("click", () => { this._closeDrawer(); this.openAseguradoraModal(); });
 
