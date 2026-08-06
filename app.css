@@ -452,8 +452,11 @@ html, body {
 .fab-send:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.75) !important; }
 .fab-send:active { transform: scale(0.94); }
 
-/* Ocultar el FAB flotante cuando el drawer móvil esté abierto para evitar solapamientos */
-body.drawer-open .fab-send {
+/* Ocultar el FAB flotante cuando el drawer móvil esté abierto, cuando hay un modal activo o cuando el teclado está abierto (input/textarea focus) para evitar solapamientos */
+body.drawer-open .fab-send,
+body:has(.modal-overlay.open) .fab-send,
+body:has(input:focus) .fab-send,
+body:has(textarea:focus) .fab-send {
   display: none !important;
 }
 
