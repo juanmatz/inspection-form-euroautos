@@ -18,6 +18,19 @@
 ### Notas técnicas (opcional)
 ```
 
+## [4.5.1] — 2026-08-05
+
+### Archivos modificados
+- `get_draft.php` — Se reemplazó el uso de `array_unique` (que fallaba al procesar arreglos de objetos) por una lógica iterativa por `url` para restaurar correctamente todas las fotos con notas desde el autoguardado.
+- `index.html` — Se eliminó definitivamente el botón flotante de envío (`.fab-send`) para evitar redundancias y mejorar la usabilidad en pantallas pequeñas.
+- `app.css` — Se eliminaron todas las referencias y media queries asociadas al botón `fab-send`. Además, se corrigió el bug del widget de estado de envío que ocupaba toda la pantalla al anular la propiedad `top` en resoluciones móviles.
+- `app.js` — Se retiraron los escuchadores de eventos del botón flotante y se integró un `MutationObserver` (junto a eventos globales `focusin/focusout`) para controlar y agregar dinámicamente la clase `modal-open` al `body`. Esto soluciona la superposición de elementos flotantes al usar teclados virtuales y abrir widgets.
+
+### Cambios
+- **Corrección de Borradores:** Al recargar la página tras cerrar sesión o actualizar, ya cargan correctamente el 100% de las imágenes previas con sus descripciones adjuntas.
+- **Limpieza de Interfaz Móvil:** Se eliminó el botón redundante inferior derecho para evitar clics accidentales y ganar espacio útil en la pantalla, unificando el punto de envío final en la barra superior o en el cajón de piezas elegidas.
+- **Solución a superposiciones visuales:** El widget negro de "Enviado con Éxito" respeta ahora su tamaño tipo píldora (Dynamic Island) en teléfonos. Las ventanas modales ya no compiten por espacio al abrir el teclado virtual.
+
 ## [4.5.0] — 2026-08-05
 
 ### Archivos modificados
