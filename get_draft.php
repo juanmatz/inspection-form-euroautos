@@ -93,7 +93,20 @@ if ($n8n_data) {
     }
 
     // Combinar las URLs de n8n y de la DB local sin duplicados
-    $combined_urls = array_values(array_unique(array_filter(array_merge($n8n_urls, $local_urls_fotos))));
+    $merged_raw = array_merge($n8n_urls, $local_urls_fotos);
+    $unique = [];
+    foreach ($merged_raw as $item) {
+        if (is_string($item) && !empty(trim($item))) {
+            if (!isset($unique[$item])) {
+                $unique[$item] = ['url' => $item, 'nota' => ''];
+            }
+        } elseif (is_array($item) && !empty($item['url'])) {
+            if (!isset($unique[$item['url']])) {
+                $unique[$item['url']] = $item;
+            }
+        }
+    }
+    $combined_urls = array_values($unique);
 
     $item['urls_fotos'] = $combined_urls;
     if (isset($item['piezas']) && is_array($item['piezas'])) {
@@ -102,7 +115,19 @@ if ($n8n_data) {
 
     $final_response = $item;
 } else if ($local_data) {
-    $local_data['urls_fotos'] = array_values(array_unique(array_filter($local_urls_fotos)));
+    $unique = [];
+    foreach ($local_urls_fotos as $item) {
+        if (is_string($item) && !empty(trim($item))) {
+            if (!isset($unique[$item])) {
+                $unique[$item] = ['url' => $item, 'nota' => ''];
+            }
+        } elseif (is_array($item) && !empty($item['url'])) {
+            if (!isset($unique[$item['url']])) {
+                $unique[$item['url']] = $item;
+            }
+        }
+    }
+    $local_data['urls_fotos'] = array_values($unique);
     $final_response = $local_data;
 }
 
