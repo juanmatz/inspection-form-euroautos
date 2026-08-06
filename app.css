@@ -454,6 +454,7 @@ html, body {
 
 /* Ocultar el FAB flotante cuando el drawer móvil esté abierto, cuando hay un modal activo o cuando el teclado está abierto (input/textarea focus) para evitar solapamientos */
 body.drawer-open .fab-send,
+body.modal-open .fab-send,
 body:has(.modal-overlay.open) .fab-send,
 body:has(input:focus) .fab-send,
 body:has(textarea:focus) .fab-send {
@@ -1357,9 +1358,14 @@ body:has(textarea:focus) .fab-send {
   }
 
   .send-status-widget {
+    top: auto;
     bottom: 12px;
-    right: 12px;
+    left: 12px;
+    transform: translateY(50px);
     width: calc(100vw - 24px);
+  }
+  .send-status-widget.open {
+    transform: translateY(0);
   }
 }
 
