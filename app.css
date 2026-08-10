@@ -424,38 +424,6 @@ html, body {
 .ab-DESMONTAJE_MONTAJE { background: rgba(251,146,60,0.15); color: var(--act-dm); }
 .ab-REVISION { background: rgba(148,163,184,0.15); color: var(--act-rev); }
 
-/* ── FAB — botón flotante siempre visible ────────────────────── */
-.fab-send {
-  display: none;
-  position: fixed !important;
-  bottom: 16px !important;
-  bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-  right: 20px !important;
-  z-index: 9999 !important;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: linear-gradient(135deg, #f97316, #ea580c) !important;
-  color: #ffffff !important;
-  border: 2px solid rgba(255, 255, 255, 0.25) !important;
-  border-radius: 30px;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: 0.5px;
-  padding: 13px 24px;
-  cursor: pointer;
-  box-shadow: 0 8px 25px rgba(249, 115, 22, 0.65), 0 0 0 1px rgba(249, 115, 22, 0.4) !important;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-  pointer-events: auto !important;
-}
-.fab-send:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(249, 115, 22, 0.75) !important; }
-.fab-send:active { transform: scale(0.94); }
-
-/* Ocultar el FAB flotante cuando el drawer móvil esté abierto para evitar solapamientos */
-body.drawer-open .fab-send {
-  display: none !important;
-}
 
 /* ── DRAWER (móvil) ──────────────────────────────────────────── */
 .drawer-overlay {
@@ -1047,6 +1015,33 @@ body.drawer-open .fab-send {
 .btn-remove-photo:hover {
   background: #f87171;
 }
+.btn-note-photo {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.9);
+  color: var(--text-2);
+  border: 1px solid var(--border-2);
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  transition: all 0.15s;
+}
+.btn-note-photo:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.btn-note-photo.has-note {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
 
 /* ── DATOS FINALES MODAL ─────────────────────────────── */
 .final-field {
@@ -1298,14 +1293,12 @@ body.drawer-open .fab-send {
 @media (max-width: 1024px) and (min-width: 768px) {
   .side-panel { display: flex !important; width: 230px; }
   .parts-grid { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
-  .fab-send { display: none !important; }
   .mobile-panel-btn { display: none !important; }
 }
 
 /* ── RESPONSIVO: MÓVIL (< 768px) ─────────────────────────── */
 @media (max-width: 767px) {
   .side-panel { display: none !important; }
-  .fab-send { display: flex !important; }
   .mobile-panel-btn { display: flex !important; }
   .parts-area { padding-bottom: 120px; }
   .parts-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
@@ -1318,18 +1311,15 @@ body.drawer-open .fab-send {
   .vs-desc { display: none; }
   .topbar-main { padding: 6px 10px; gap: 6px; }
 
-  .fab-send {
-    bottom: 16px !important;
-    bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
-    right: 16px !important;
-    padding: 11px 20px;
-    font-size: 0.95rem;
-  }
-
   .send-status-widget {
+    top: auto;
     bottom: 12px;
-    right: 12px;
+    left: 12px;
+    transform: translateY(50px);
     width: calc(100vw - 24px);
+  }
+  .send-status-widget.open {
+    transform: translateY(0);
   }
 }
 

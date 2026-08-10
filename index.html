@@ -13,7 +13,7 @@
 <body>
 
 <input type="hidden" id="uid" />
-<input type="file" id="photo-input" multiple accept="image/*" capture="environment" style="display:none;" />
+<input type="file" id="photo-input" multiple accept="image/*" style="display:none;" />
 
 <!-- ═══════════════════════════════════════════════════════
      TOPBAR — siempre visible, compacta, no scrollea
@@ -162,14 +162,6 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════════
-     FAB — botón enviar flotante (móvil / cuando panel no visible)
-     ═══════════════════════════════════════════════════════ -->
-<button class="fab-send" id="fab-send">
-  <i class="fas fa-paper-plane"></i>
-  <span>Enviar</span>
-</button>
-
 
 <!-- ═══════════════════════════════════════════════════════
      DRAWER MÓVIL — lista de piezas seleccionadas
@@ -203,6 +195,27 @@
     <div class="modal-foot">
       <button class="btn-primary" id="btn-save-notes">
         <i class="fas fa-check"></i> Guardar y Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: NOTA DE FOTO -->
+<div class="modal-overlay" id="photo-note-modal">
+  <div class="modal-box" style="max-width:440px;">
+    <div class="modal-head">
+      <h3><i class="fas fa-comment-dots"></i> Nota de Foto</h3>
+      <button class="btn-close-modal" id="close-photo-note">×</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="photo-note-id" />
+      <textarea id="photo-note-textarea" class="notes-textarea" rows="4"
+        placeholder="Escribe una nota o descripción para esta foto..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="btn-cancel-photo-note">Cancelar</button>
+      <button class="btn-primary" id="btn-save-photo-note">
+        <i class="fas fa-check"></i> Guardar Nota
       </button>
     </div>
   </div>

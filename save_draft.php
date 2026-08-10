@@ -53,7 +53,20 @@ try {
 
     // Preservar las fotos recibidas o existentes
     $incomingPhotos = isset($piezasInput['__urls_fotos__']) && is_array($piezasInput['__urls_fotos__']) ? $piezasInput['__urls_fotos__'] : [];
-    $mergedPhotos = array_values(array_unique(array_filter(array_merge($incomingPhotos, $existingPhotos))));
+    $mergedPhotosRaw = array_merge($incomingPhotos, $existingPhotos);
+    $uniquePhotos = [];
+    foreach ($mergedPhotosRaw as $item) {
+        if (is_string($item) && !empty(trim($item))) {
+            if (!isset($uniquePhotos[$item])) {
+                $uniquePhotos[$item] = ['url' => $item, 'nota' => ''];
+            }
+        } elseif (is_array($item) && !empty($item['url'])) {
+            if (!isset($uniquePhotos[$item['url']])) {
+                $uniquePhotos[$item['url']] = $item;
+            }
+        }
+    }
+    $mergedPhotos = array_values($uniquePhotos);
 
     if (!empty($mergedPhotos)) {
         $piezasInput['__urls_fotos__'] = $mergedPhotos;

@@ -692,6 +692,7 @@ class InspectionApp {
     this._aseguradoraModal = document.getElementById("aseguradora-modal");
     this.fotos             = [];
     this.existingFotos     = [];
+    this.fotoNotes         = {}; // { "filename_or_url": "nota" }
     this.aseguradora       = null; // Valor seleccionado: Allianz | HDI | Mapfre | Personal
   }
 
@@ -878,9 +879,16 @@ class InspectionApp {
       badge.style.fontSize = "0.55rem";
       badge.style.pointerEvents = "none";
 
+      const btnNote = document.createElement("button");
+      btnNote.className = "btn-note-photo" + (this.fotoNotes[url] ? " has-note" : "");
+      btnNote.innerHTML = '<i class="fas fa-comment-dots"></i>';
+      btnNote.title = "Agregar nota";
+      btnNote.addEventListener("click", () => this._openPhotoNoteModal(url));
+
       item.appendChild(img);
       item.appendChild(badge);
       item.appendChild(btnRemove);
+      item.appendChild(btnNote);
       grid.appendChild(item);
     });
 
@@ -898,8 +906,16 @@ class InspectionApp {
       btnRemove.innerHTML = "×";
       btnRemove.addEventListener("click", () => this._removePhoto(index));
 
+      const photoId = file.name;
+      const btnNote = document.createElement("button");
+      btnNote.className = "btn-note-photo" + (this.fotoNotes[photoId] ? " has-note" : "");
+      btnNote.innerHTML = '<i class="fas fa-comment-dots"></i>';
+      btnNote.title = "Agregar nota";
+      btnNote.addEventListener("click", () => this._openPhotoNoteModal(photoId));
+
       item.appendChild(img);
       item.appendChild(btnRemove);
+      item.appendChild(btnNote);
       grid.appendChild(item);
     });
 
@@ -916,6 +932,22 @@ class InspectionApp {
     this.existingFotos.splice(index, 1);
     this._renderPhotoPreviews();
     this.saver.schedule();
+  }
+
+  _openPhotoNoteModal(photoId) {
+    const modal = document.getElementById("photo-note-modal");
+    const idInput = document.getElementById("photo-note-id");
+    const textarea = document.getElementById("photo-note-textarea");
+    if (!modal || !idInput || !textarea) return;
+
+    idInput.value = photoId;
+    textarea.value = this.fotoNotes[photoId] || "";
+    modal.classList.add("open");
+  }
+
+  _closePhotoNoteModal() {
+    const modal = document.getElementById("photo-note-modal");
+    if (modal) modal.classList.remove("open");
   }
 
   _onUpdate(skipSave = false) {
@@ -959,12 +991,23 @@ class InspectionApp {
       if (typeof piezas === "string") piezas = JSON.parse(piezas);
 
       // Cargar fotos existentes del borrador
+      let loadedFotos = [];
       if (data.urls_fotos && Array.isArray(data.urls_fotos)) {
-        this.existingFotos = data.urls_fotos.filter(Boolean);
+        loadedFotos = data.urls_fotos.filter(Boolean);
       } else if (piezas && piezas.__urls_fotos__) {
-        this.existingFotos = piezas.__urls_fotos__;
+        loadedFotos = piezas.__urls_fotos__;
         delete piezas.__urls_fotos__;
       }
+      
+      this.existingFotos = [];
+      loadedFotos.forEach(f => {
+        if (typeof f === "object" && f.url) {
+          this.existingFotos.push(f.url);
+          if (f.nota) this.fotoNotes[f.url] = f.nota;
+        } else if (typeof f === "string") {
+          this.existingFotos.push(f);
+        }
+      });
       this._renderPhotoPreviews();
 
       if (data.observaciones) {
@@ -993,7 +1036,10 @@ class InspectionApp {
       Object.assign(piezas, card.toJSON());
     });
     if (this.existingFotos && this.existingFotos.length > 0) {
-      piezas.__urls_fotos__ = this.existingFotos;
+      piezas.__urls_fotos__ = this.existingFotos.map(url => ({
+        url: url,
+        nota: this.fotoNotes[url] || ""
+      }));
     }
     return {
       uid: this.uid,
@@ -1081,12 +1127,17 @@ class InspectionApp {
     const piezas = {};
     this.cards.forEach(card => { Object.assign(piezas, card.toJSON()); });
 
+    const existingFotosWithNotes = this.existingFotos.map(url => ({
+      url: url,
+      nota: this.fotoNotes[url] || ""
+    }));
+
     const payload = {
       uid: this.uid,
       piezas,
       total_piezas: Object.keys(piezas).length,
       observaciones: document.getElementById("general-notes")?.value || "",
-      urls_fotos: this.existingFotos,
+      urls_fotos: existingFotosWithNotes,
       aseguradora: this.aseguradora,
       kilometraje: this.kilometraje,
       ubicacion: this.ubicacion,
@@ -1111,6 +1162,7 @@ class InspectionApp {
     }));
     this.fotos.forEach(file => {
       formData.append("fotos[]", file);
+      formData.append("notas_fotos_nuevas[]", this.fotoNotes[file.name] || "");
     });
 
     try {
@@ -1245,6 +1297,33 @@ class InspectionApp {
   }
 
   _bindGlobalActions() {
+    // ── Solución para ocultar FAB flotante al abrir modales o teclados virtuales ──
+    document.addEventListener("focusin", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+        document.body.classList.add("modal-open");
+      }
+    });
+    document.addEventListener("focusout", (e) => {
+      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
+        setTimeout(() => {
+          if (!document.querySelector(".modal-overlay.open")) {
+            document.body.classList.remove("modal-open");
+          }
+        }, 100);
+      }
+    });
+    const modalObserver = new MutationObserver(() => {
+      if (document.querySelector(".modal-overlay.open")) {
+        document.body.classList.add("modal-open");
+      } else {
+        const act = document.activeElement;
+        if (!act || (act.tagName !== "INPUT" && act.tagName !== "TEXTAREA")) {
+          document.body.classList.remove("modal-open");
+        }
+      }
+    });
+    modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ["class"] });
+
     // Notes
     document.getElementById("btn-open-notes")?.addEventListener("click", () => this.toggleNotes());
     document.getElementById("close-notes")?.addEventListener("click", () => this.toggleNotes());
@@ -1261,9 +1340,8 @@ class InspectionApp {
       location.reload();
     });
 
-    // Send buttons (panel, FAB, drawer, topbar) → pasan por el modal de aseguradora
+    // Send buttons (panel, drawer, topbar) → pasan por el modal de aseguradora
     document.getElementById("btn-send")?.addEventListener("click", () => this.openAseguradoraModal());
-    document.getElementById("fab-send")?.addEventListener("click", () => this.openAseguradoraModal());
     document.getElementById("btn-topbar-send")?.addEventListener("click", () => this.openAseguradoraModal());
     document.getElementById("btn-send-drawer")?.addEventListener("click", () => { this._closeDrawer(); this.openAseguradoraModal(); });
 
@@ -1306,6 +1384,25 @@ class InspectionApp {
     });
     document.getElementById("btn-cancel-aseg")?.addEventListener("click", () => this.closeAseguradoraModal());
     document.getElementById("close-aseg")?.addEventListener("click", () => this.closeAseguradoraModal());
+
+    // Photo Note Modal
+    document.getElementById("close-photo-note")?.addEventListener("click", () => this._closePhotoNoteModal());
+    document.getElementById("btn-cancel-photo-note")?.addEventListener("click", () => this._closePhotoNoteModal());
+    document.getElementById("btn-save-photo-note")?.addEventListener("click", () => {
+      const idInput = document.getElementById("photo-note-id");
+      const textarea = document.getElementById("photo-note-textarea");
+      if (idInput && textarea) {
+        const val = textarea.value.trim();
+        if (val) {
+          this.fotoNotes[idInput.value] = val;
+        } else {
+          delete this.fotoNotes[idInput.value];
+        }
+        this._renderPhotoPreviews(); // re-render to show/hide badge
+        this.saver.schedule();
+      }
+      this._closePhotoNoteModal();
+    });
 
     // Mobile drawer
     document.getElementById("mobile-panel-btn")?.addEventListener("click", () => this._openDrawer());
