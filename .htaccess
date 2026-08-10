@@ -1,0 +1,17 @@
+# Bloquear el acceso web directo a archivos ocultos y sensibles
+<IfModule mod_authz_core.c>
+    <FilesMatch "^\.">
+        Require all denied
+    </FilesMatch>
+</IfModule>
+
+<IfModule !mod_authz_core.c>
+    <FilesMatch "^\.">
+        Order allow,deny
+        Deny from all
+        Satisfy All
+    </FilesMatch>
+</IfModule>
+
+# Evitar listado de directorios
+Options -Indexes
