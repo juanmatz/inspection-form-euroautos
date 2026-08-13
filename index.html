@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -10,333 +11,336 @@
   <link rel="stylesheet" href="app.css?v=4.3.2" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
+
 <body>
 
-<input type="hidden" id="uid" />
-<input type="file" id="photo-input" multiple accept="image/*" style="display:none;" />
+  <input type="hidden" id="uid" />
+  <input type="file" id="photo-input" multiple accept="image/*" style="display:none;" />
 
-<!-- ═══════════════════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════════════════
      TOPBAR — siempre visible, compacta, no scrollea
      ═══════════════════════════════════════════════════════ -->
-<div class="topbar">
+  <div class="topbar">
 
-  <!-- Fila 1: logo + placa resumen + acciones -->
-  <div class="topbar-main">
-    <div class="topbar-brand">
-      <div class="brand-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
-          <rect x="1" y="3" width="15" height="13" rx="2"/>
-          <path d="M16 8h4l3 5v3h-7V8z"/>
-          <circle cx="5.5" cy="18.5" r="2.5"/>
-          <circle cx="18.5" cy="18.5" r="2.5"/>
-        </svg>
+    <!-- Fila 1: logo + placa resumen + acciones -->
+    <div class="topbar-main">
+      <div class="topbar-brand">
+        <div class="brand-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2">
+            <rect x="1" y="3" width="15" height="13" rx="2" />
+            <path d="M16 8h4l3 5v3h-7V8z" />
+            <circle cx="5.5" cy="18.5" r="2.5" />
+            <circle cx="18.5" cy="18.5" r="2.5" />
+          </svg>
+        </div>
+        <span class="brand-name">EURO AUTOS</span>
       </div>
-      <span class="brand-name">EURO AUTOS</span>
-    </div>
 
-    <!-- Resumen vehículo — siempre visible -->
-    <div class="vehicle-summary" id="vehicle-summary">
-      <span class="vs-placa" id="vs-placa">—</span>
-      <span class="vs-sep">·</span>
-      <span class="vs-desc" id="vs-desc">Sin vehículo</span>
-    </div>
-
-    <div class="topbar-actions">
-      <div class="autosave-pill" id="autosave-pill">
-        <span class="dot" id="autosave-dot"></span>
-        <span id="autosave-txt">Listo</span>
+      <!-- Resumen vehículo — siempre visible -->
+      <div class="vehicle-summary" id="vehicle-summary">
+        <span class="vs-placa" id="vs-placa">—</span>
+        <span class="vs-sep">·</span>
+        <span class="vs-desc" id="vs-desc">Sin vehículo</span>
       </div>
-      <button class="btn-icon" id="btn-capture-photo" title="Tomar Fotos">
-        <i class="fas fa-camera"></i>
+
+      <div class="topbar-actions">
+        <div class="autosave-pill" id="autosave-pill">
+          <span class="dot" id="autosave-dot"></span>
+          <span id="autosave-txt">Listo</span>
+        </div>
+        <button class="btn-icon" id="btn-capture-photo" title="Tomar Fotos">
+          <i class="fas fa-camera"></i>
+        </button>
+        <button class="btn-icon" id="btn-open-notes" title="Observaciones">
+          <i class="fas fa-clipboard-list"></i>
+        </button>
+        <!-- Toggle datos vehículo -->
+        <button class="btn-icon" id="btn-toggle-vh" title="Datos del vehículo">
+          <i class="fas fa-chevron-down" id="toggle-vh-icon"></i>
+        </button>
+        <!-- Botón Enviar con chulo naranja (esquina superior derecha) -->
+        <button class="btn-topbar-send" id="btn-topbar-send" title="Enviar Inspección">
+          <i class="fas fa-check"></i> <span>ENVIAR</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Fila 2: datos vehículo — colapsable -->
+    <div class="vehicle-fields" id="vehicle-fields">
+      <div class="vh-field">
+        <label for="input-placa">Placa</label>
+        <input type="text" id="input-placa" class="vh-input" placeholder="ABC123" />
+      </div>
+      <div class="vh-field">
+        <label for="input-marca">Marca</label>
+        <input type="text" id="input-marca" class="vh-input" placeholder="Marca" />
+      </div>
+      <div class="vh-field vf-lg">
+        <label for="input-linea">Línea</label>
+        <input type="text" id="input-linea" class="vh-input" placeholder="Línea" />
+      </div>
+      <div class="vh-field vf-sm">
+        <label for="input-modelo">Modelo</label>
+        <input type="text" id="input-modelo" class="vh-input" placeholder="Año" />
+      </div>
+      <div class="vh-field">
+        <label for="input-color">Color</label>
+        <input type="text" id="input-color" class="vh-input" placeholder="Color" />
+      </div>
+      <div class="vh-field vf-xl">
+        <label for="input-vin">VIN / Chasis</label>
+        <input type="text" id="input-vin" class="vh-input" placeholder="VIN" />
+      </div>
+      <div class="vh-field vf-xl">
+        <label for="input-propietario">Propietario</label>
+        <input type="text" id="input-propietario" class="vh-input" placeholder="Nombre" />
+      </div>
+      <div class="vh-field vf-lg">
+        <label for="input-cedula">Cédula / NIT</label>
+        <input type="text" id="input-cedula" class="vh-input" placeholder="Cédula" />
+      </div>
+    </div>
+
+    <!-- Fila de previsualización de fotos — colapsable -->
+    <div class="photo-previews-container" id="photo-previews-container" style="display:none;">
+      <div class="preview-header">
+        <span class="preview-title"><i class="fas fa-images"></i> Fotos Capturadas (<span
+            id="photo-count">0</span>)</span>
+        <button class="btn-close-preview" id="btn-close-preview" title="Ocultar panel">×</button>
+      </div>
+      <div class="photo-grid" id="photo-grid"></div>
+    </div>
+
+    <!-- Fila 3: búsqueda + categorías — SIEMPRE VISIBLE -->
+    <div class="search-row">
+      <div class="search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" class="search-input" placeholder="Buscar pieza..." />
+        <button class="search-clear" id="search-clear" style="display:none;">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <!-- contador flotante móvil -->
+      <button class="mobile-panel-btn" id="mobile-panel-btn" title="Ver seleccionadas">
+        <i class="fas fa-list-check"></i>
+        <span class="mobile-count" id="mobile-count">0</span>
       </button>
-      <button class="btn-icon" id="btn-open-notes" title="Observaciones">
-        <i class="fas fa-clipboard-list"></i>
-      </button>
-      <!-- Toggle datos vehículo -->
-      <button class="btn-icon" id="btn-toggle-vh" title="Datos del vehículo">
-        <i class="fas fa-chevron-down" id="toggle-vh-icon"></i>
-      </button>
-      <!-- Botón Enviar con chulo naranja (esquina superior derecha) -->
-      <button class="btn-topbar-send" id="btn-topbar-send" title="Enviar Inspección">
-        <i class="fas fa-check"></i> <span>ENVIAR</span>
-      </button>
     </div>
-  </div>
+    <div class="cat-nav-wrap">
+      <div class="cat-nav" id="cat-nav"></div>
+    </div>
 
-  <!-- Fila 2: datos vehículo — colapsable -->
-  <div class="vehicle-fields" id="vehicle-fields">
-    <div class="vh-field">
-      <label for="input-placa">Placa</label>
-      <input type="text" id="input-placa" class="vh-input" placeholder="ABC123" />
-    </div>
-    <div class="vh-field">
-      <label for="input-marca">Marca</label>
-      <input type="text" id="input-marca" class="vh-input" placeholder="Marca" />
-    </div>
-    <div class="vh-field vf-lg">
-      <label for="input-linea">Línea</label>
-      <input type="text" id="input-linea" class="vh-input" placeholder="Línea" />
-    </div>
-    <div class="vh-field vf-sm">
-      <label for="input-modelo">Modelo</label>
-      <input type="text" id="input-modelo" class="vh-input" placeholder="Año" />
-    </div>
-    <div class="vh-field">
-      <label for="input-color">Color</label>
-      <input type="text" id="input-color" class="vh-input" placeholder="Color" />
-    </div>
-    <div class="vh-field vf-xl">
-      <label for="input-vin">VIN / Chasis</label>
-      <input type="text" id="input-vin" class="vh-input" placeholder="VIN" />
-    </div>
-    <div class="vh-field vf-xl">
-      <label for="input-propietario">Propietario</label>
-      <input type="text" id="input-propietario" class="vh-input" placeholder="Nombre" />
-    </div>
-    <div class="vh-field vf-lg">
-      <label for="input-cedula">Cédula / NIT</label>
-      <input type="text" id="input-cedula" class="vh-input" placeholder="Cédula" />
-    </div>
-  </div>
-
-  <!-- Fila de previsualización de fotos — colapsable -->
-  <div class="photo-previews-container" id="photo-previews-container" style="display:none;">
-    <div class="preview-header">
-      <span class="preview-title"><i class="fas fa-images"></i> Fotos Capturadas (<span id="photo-count">0</span>)</span>
-      <button class="btn-close-preview" id="btn-close-preview" title="Ocultar panel">×</button>
-    </div>
-    <div class="photo-grid" id="photo-grid"></div>
-  </div>
-
-  <!-- Fila 3: búsqueda + categorías — SIEMPRE VISIBLE -->
-  <div class="search-row">
-    <div class="search-wrap">
-      <i class="fas fa-search"></i>
-      <input type="text" id="search-input" class="search-input" placeholder="Buscar pieza..." />
-      <button class="search-clear" id="search-clear" style="display:none;">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-    <!-- contador flotante móvil -->
-    <button class="mobile-panel-btn" id="mobile-panel-btn" title="Ver seleccionadas">
-      <i class="fas fa-list-check"></i>
-      <span class="mobile-count" id="mobile-count">0</span>
-    </button>
-  </div>
-  <div class="cat-nav-wrap">
-    <div class="cat-nav" id="cat-nav"></div>
-  </div>
-
-</div><!-- .topbar -->
+  </div><!-- .topbar -->
 
 
-<!-- ═══════════════════════════════════════════════════════
+  <!-- ═══════════════════════════════════════════════════════
      BODY LAYOUT
      ═══════════════════════════════════════════════════════ -->
-<div class="body-layout">
+  <div class="body-layout">
 
-  <!-- Piezas — scroll aquí -->
-  <div class="parts-area" id="sections-scroll">
-    <div id="sections-root"></div>
+    <!-- Piezas — scroll aquí -->
+    <div class="parts-area" id="sections-scroll">
+      <div id="sections-root"></div>
+    </div>
+
+    <!-- Panel lateral — desktop -->
+    <aside class="side-panel" id="side-panel">
+      <div class="panel-head">
+        <span class="panel-title"><i class="fas fa-list-check"></i> Seleccionadas</span>
+        <span class="panel-count" id="panel-count">0</span>
+      </div>
+      <div class="panel-body" id="panel-body">
+        <div class="panel-empty">
+          <i class="fas fa-car-burst"></i>
+          No hay piezas seleccionadas
+        </div>
+      </div>
+      <div class="panel-foot">
+        <button class="btn-send-main" id="btn-send">
+          <i class="fas fa-paper-plane"></i> Finalizar y Enviar
+        </button>
+      </div>
+    </aside>
+
   </div>
 
-  <!-- Panel lateral — desktop -->
-  <aside class="side-panel" id="side-panel">
-    <div class="panel-head">
-      <span class="panel-title"><i class="fas fa-list-check"></i> Seleccionadas</span>
-      <span class="panel-count" id="panel-count">0</span>
+
+
+  <!-- ═══════════════════════════════════════════════════════
+     DRAWER MÓVIL — lista de piezas seleccionadas
+     ═══════════════════════════════════════════════════════ -->
+  <div class="drawer-overlay" id="drawer-overlay"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-head">
+      <span class="panel-title"><i class="fas fa-list-check"></i> Piezas seleccionadas</span>
+      <button class="btn-close-modal" id="close-drawer">×</button>
     </div>
-    <div class="panel-body" id="panel-body">
-      <div class="panel-empty">
-        <i class="fas fa-car-burst"></i>
-        No hay piezas seleccionadas
-      </div>
-    </div>
-    <div class="panel-foot">
-      <button class="btn-send-main" id="btn-send">
+    <div class="drawer-body" id="drawer-body"></div>
+    <div class="drawer-foot">
+      <button class="btn-send-main" id="btn-send-drawer">
         <i class="fas fa-paper-plane"></i> Finalizar y Enviar
       </button>
     </div>
-  </aside>
-
-</div>
-
-
-
-<!-- ═══════════════════════════════════════════════════════
-     DRAWER MÓVIL — lista de piezas seleccionadas
-     ═══════════════════════════════════════════════════════ -->
-<div class="drawer-overlay" id="drawer-overlay"></div>
-<div class="drawer" id="drawer">
-  <div class="drawer-head">
-    <span class="panel-title"><i class="fas fa-list-check"></i> Piezas seleccionadas</span>
-    <button class="btn-close-modal" id="close-drawer">×</button>
   </div>
-  <div class="drawer-body" id="drawer-body"></div>
-  <div class="drawer-foot">
-    <button class="btn-send-main" id="btn-send-drawer">
-      <i class="fas fa-paper-plane"></i> Finalizar y Enviar
-    </button>
-  </div>
-</div>
 
 
-<!-- MODAL: NOTAS -->
-<div class="modal-overlay" id="notes-modal">
-  <div class="modal-box" style="max-width:480px;">
-    <div class="modal-head">
-      <h3><i class="fas fa-clipboard-list"></i> Observaciones Generales</h3>
-      <button class="btn-close-modal" id="close-notes">×</button>
-    </div>
-    <div class="modal-body">
-      <textarea id="general-notes" class="notes-textarea" rows="8"
-        placeholder="Observaciones, detalles adicionales o trabajos extra..."></textarea>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-primary" id="btn-save-notes">
-        <i class="fas fa-check"></i> Guardar y Cerrar
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: NOTA DE FOTO -->
-<div class="modal-overlay" id="photo-note-modal">
-  <div class="modal-box" style="max-width:440px;">
-    <div class="modal-head">
-      <h3><i class="fas fa-comment-dots"></i> Nota de Foto</h3>
-      <button class="btn-close-modal" id="close-photo-note">×</button>
-    </div>
-    <div class="modal-body">
-      <input type="hidden" id="photo-note-id" />
-      <textarea id="photo-note-textarea" class="notes-textarea" rows="4"
-        placeholder="Escribe una nota o descripción para esta foto..."></textarea>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-secondary" id="btn-cancel-photo-note">Cancelar</button>
-      <button class="btn-primary" id="btn-save-photo-note">
-        <i class="fas fa-check"></i> Guardar Nota
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: ÉXITO TELEGRAM -->
-<div class="modal-overlay" id="success-modal">
-  <div class="modal-box success-modal-box">
-    <div class="success-icon-wrap">
-      <i class="fas fa-paper-plane"></i>
-    </div>
-    <h2 class="success-title">¡Inspección Enviada!</h2>
-    <p class="success-text">
-      Tu inspección ha sido enviada correctamente.<br/>
-      Recibirás el PDF en <strong>Telegram</strong> en breve.
-    </p>
-    <div class="success-hint">
-      <i class="fab fa-telegram-plane"></i> Revisa tu chat de Telegram
-    </div>
-    <button class="btn-primary success-btn" id="btn-close-success">
-      <i class="fas fa-check"></i> Entendido
-    </button>
-  </div>
-</div>
-
-<!-- MODAL: CONFIRMACIÓN -->
-<div class="modal-overlay" id="confirm-modal">
-  <div class="modal-box" style="max-width:520px;">
-    <div class="modal-head">
-      <h3><i class="fas fa-check-double"></i> Confirmar Envío</h3>
-      <button class="btn-close-modal" id="close-confirm">×</button>
-    </div>
-    <div class="modal-body">
-      <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:12px;">
-        Revise los datos antes de enviar. Se generará el PDF y se enviará por Telegram.
-      </p>
-      <div class="confirm-list" id="confirm-list"></div>
-      <div class="confirm-obs" id="confirm-obs"></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn-secondary" id="btn-cancel-confirm">Cancelar</button>
-      <button class="btn-primary" id="btn-confirm-send">
-        <i class="fas fa-check"></i> Confirmar y Enviar
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL: DATOS FINALES DE ENVÍO -->
-<div class="modal-overlay" id="aseguradora-modal">
-  <div class="modal-box" style="max-width:440px;">
-    <div class="modal-head">
-      <h3><i class="fas fa-paper-plane"></i> Confirmación de Envío</h3>
-      <button class="btn-close-modal" id="close-aseg">×</button>
-    </div>
-    <div class="modal-body" style="max-height:75vh; overflow-y:auto; padding-right:5px;">
-      <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:16px;">
-        Completa los datos antes de continuar. <strong style="color:var(--accent);">Obligatorios.</strong>
-      </p>
-
-      <div class="final-field">
-        <label for="input-kilometraje"><i class="fas fa-gauge"></i> Kilometraje Actual</label>
-        <input type="number" id="input-kilometraje" class="final-input" placeholder="Ej: 45000" min="0" />
+  <!-- MODAL: NOTAS -->
+  <div class="modal-overlay" id="notes-modal">
+    <div class="modal-box" style="max-width:480px;">
+      <div class="modal-head">
+        <h3><i class="fas fa-clipboard-list"></i> Observaciones Generales</h3>
+        <button class="btn-close-modal" id="close-notes">×</button>
       </div>
+      <div class="modal-body">
+        <textarea id="general-notes" class="notes-textarea" rows="8"
+          placeholder="Observaciones, detalles adicionales o trabajos extra..."></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-primary" id="btn-save-notes">
+          <i class="fas fa-check"></i> Guardar y Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
 
-      <div class="final-field">
-        <label><i class="fas fa-shield-halved"></i> Aseguradora</label>
-        <div class="aseg-grid" id="aseg-grid">
-          <button class="aseg-btn" id="aseg-Allianz" data-value="Allianz">
-            <i class="fas fa-building"></i> Allianz
-          </button>
-          <button class="aseg-btn" id="aseg-HDI" data-value="HDI">
-            <i class="fas fa-building"></i> HDI
-          </button>
-          <button class="aseg-btn" id="aseg-Mapfre" data-value="Mapfre">
-            <i class="fas fa-building"></i> Mapfre
-          </button>
-          <button class="aseg-btn" id="aseg-Personal" data-value="Personal">
-            <i class="fas fa-user"></i> Personal
-          </button>
+  <!-- MODAL: NOTA DE FOTO -->
+  <div class="modal-overlay" id="photo-note-modal">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-head">
+        <h3><i class="fas fa-comment-dots"></i> Nota de Foto</h3>
+        <button class="btn-close-modal" id="close-photo-note">×</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="photo-note-id" />
+        <textarea id="photo-note-textarea" class="notes-textarea" rows="4"
+          placeholder="Escribe una nota o descripción para esta foto..."></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btn-cancel-photo-note">Cancelar</button>
+        <button class="btn-primary" id="btn-save-photo-note">
+          <i class="fas fa-check"></i> Guardar Nota
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ÉXITO TELEGRAM -->
+  <div class="modal-overlay" id="success-modal">
+    <div class="modal-box success-modal-box">
+      <div class="success-icon-wrap">
+        <i class="fas fa-paper-plane"></i>
+      </div>
+      <h2 class="success-title">¡Inspección Enviada!</h2>
+      <p class="success-text">
+        Tu inspección ha sido enviada correctamente.<br />
+        Recibirás el PDF en <strong>Telegram</strong> en breve.
+      </p>
+      <div class="success-hint">
+        <i class="fab fa-telegram-plane"></i> Revisa tu chat de Telegram
+      </div>
+      <button class="btn-primary success-btn" id="btn-close-success">
+        <i class="fas fa-check"></i> Entendido
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMACIÓN -->
+  <div class="modal-overlay" id="confirm-modal">
+    <div class="modal-box" style="max-width:520px;">
+      <div class="modal-head">
+        <h3><i class="fas fa-check-double"></i> Confirmar Envío</h3>
+        <button class="btn-close-modal" id="close-confirm">×</button>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:12px;">
+          Revise los datos antes de enviar. Se generará el PDF y se enviará por Telegram.
+        </p>
+        <div class="confirm-list" id="confirm-list"></div>
+        <div class="confirm-obs" id="confirm-obs"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btn-cancel-confirm">Cancelar</button>
+        <button class="btn-primary" id="btn-confirm-send">
+          <i class="fas fa-check"></i> Confirmar y Enviar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: DATOS FINALES DE ENVÍO -->
+  <div class="modal-overlay" id="aseguradora-modal">
+    <div class="modal-box" style="max-width:440px;">
+      <div class="modal-head">
+        <h3><i class="fas fa-paper-plane"></i> Confirmación de Envío</h3>
+        <button class="btn-close-modal" id="close-aseg">×</button>
+      </div>
+      <div class="modal-body" style="max-height:75vh; overflow-y:auto; padding-right:5px;">
+        <p style="color:var(--text-2);font-size:0.85rem;margin-bottom:16px;">
+          Completa los datos antes de continuar. <strong style="color:var(--accent);">Obligatorios.</strong>
+        </p>
+
+        <div class="final-field">
+          <label for="input-kilometraje"><i class="fas fa-gauge"></i> Kilometraje Actual</label>
+          <input type="number" id="input-kilometraje" class="final-input" placeholder="Ej: 45000" min="0" />
+        </div>
+
+        <div class="final-field">
+          <label><i class="fas fa-shield-halved"></i> Aseguradora</label>
+          <div class="aseg-grid" id="aseg-grid">
+            <button class="aseg-btn" id="aseg-Allianz" data-value="Allianz">
+              <i class="fas fa-building"></i> Allianz
+            </button>
+            <button class="aseg-btn" id="aseg-HDI" data-value="HDI">
+              <i class="fas fa-building"></i> HDI
+            </button>
+            <button class="aseg-btn" id="aseg-Mapfre" data-value="Mapfre">
+              <i class="fas fa-building"></i> Mapfre
+            </button>
+            <button class="aseg-btn" id="aseg-Personal" data-value="Personal">
+              <i class="fas fa-user"></i> Personal
+            </button>
+          </div>
+        </div>
+
+        <div class="final-field">
+          <label><i class="fas fa-location-dot"></i> Ubicación del Vehículo</label>
+          <div class="ubicacion-grid" id="ubicacion-grid">
+            <button class="ubic-btn" data-value="En taller"><i class="fas fa-warehouse"></i> En taller</button>
+            <button class="ubic-btn" data-value="Por fuera"><i class="fas fa-road"></i> Por fuera</button>
+          </div>
+        </div>
+
+        <div class="aseg-error" id="aseg-error" style="display:none;">
+          <i class="fas fa-exclamation-circle"></i> Debes completar todos los campos obligatorios.
         </div>
       </div>
-
-      <div class="final-field">
-        <label><i class="fas fa-location-dot"></i> Ubicación del Vehículo</label>
-        <div class="ubicacion-grid" id="ubicacion-grid">
-          <button class="ubic-btn" data-value="En taller"><i class="fas fa-warehouse"></i> En taller</button>
-          <button class="ubic-btn" data-value="Por fuera"><i class="fas fa-road"></i> Por fuera</button>
-        </div>
-      </div>
-
-      <div class="aseg-error" id="aseg-error" style="display:none;">
-        <i class="fas fa-exclamation-circle"></i> Debes completar todos los campos obligatorios.
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btn-cancel-aseg">Cancelar</button>
+        <button class="btn-primary" id="btn-confirm-aseg">
+          <i class="fas fa-arrow-right"></i> Continuar
+        </button>
       </div>
     </div>
-    <div class="modal-foot">
-      <button class="btn-secondary" id="btn-cancel-aseg">Cancelar</button>
-      <button class="btn-primary" id="btn-confirm-aseg">
-        <i class="fas fa-arrow-right"></i> Continuar
-      </button>
+  </div>
+
+  <!-- WIDGET FLOTANTE DE ENVÍO -->
+  <div class="send-status-widget" id="send-status-widget">
+    <div class="sw-body">
+      <div class="sw-icon" id="sw-icon">
+        <i class="fas fa-paper-plane sw-sending-icon"></i>
+      </div>
+      <div class="sw-info">
+        <div class="sw-title" id="sw-title">Enviando Inspección...</div>
+        <div class="sw-desc" id="sw-desc">Generando PDF y enviando a Telegram.</div>
+      </div>
+      <button class="sw-btn" id="sw-action-btn" style="display:none;">Nueva</button>
+      <button class="sw-close-btn" id="sw-close-btn" title="Cerrar notificación">×</button>
     </div>
   </div>
-</div>
 
-<!-- WIDGET FLOTANTE DE ENVÍO -->
-<div class="send-status-widget" id="send-status-widget">
-  <div class="sw-body">
-    <div class="sw-icon" id="sw-icon">
-      <i class="fas fa-paper-plane sw-sending-icon"></i>
-    </div>
-    <div class="sw-info">
-      <div class="sw-title" id="sw-title">Enviando Inspección...</div>
-      <div class="sw-desc" id="sw-desc">Generando PDF y enviando a Telegram.</div>
-    </div>
-    <button class="sw-btn" id="sw-action-btn" style="display:none;">Nueva</button>
-    <button class="sw-close-btn" id="sw-close-btn" title="Cerrar notificación">×</button>
-  </div>
-</div>
+  <div class="toast-container" id="toast-container"></div>
 
-<div class="toast-container" id="toast-container"></div>
-
-<script src="app.js?v=4.3.1"></script>
+  <script src="app.js?v=4.3.2"></script>
 </body>
+
 </html>

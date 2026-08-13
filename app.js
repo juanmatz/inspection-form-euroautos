@@ -1297,32 +1297,9 @@ class InspectionApp {
   }
 
   _bindGlobalActions() {
-    // ── Solución para ocultar FAB flotante al abrir modales o teclados virtuales ──
-    document.addEventListener("focusin", (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
-        document.body.classList.add("modal-open");
-      }
-    });
-    document.addEventListener("focusout", (e) => {
-      if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") {
-        setTimeout(() => {
-          if (!document.querySelector(".modal-overlay.open")) {
-            document.body.classList.remove("modal-open");
-          }
-        }, 100);
-      }
-    });
-    const modalObserver = new MutationObserver(() => {
-      if (document.querySelector(".modal-overlay.open")) {
-        document.body.classList.add("modal-open");
-      } else {
-        const act = document.activeElement;
-        if (!act || (act.tagName !== "INPUT" && act.tagName !== "TEXTAREA")) {
-          document.body.classList.remove("modal-open");
-        }
-      }
-    });
-    modalObserver.observe(document.body, { attributes: true, subtree: true, attributeFilter: ["class"] });
+    // NOTE: focusin/focusout handlers for 'modal-open' class removed — they were part of
+    // the FAB visibility feature that was eliminated in commit 361ebfa.
+    // The 'modal-open' class is not referenced in CSS.
 
     // Notes
     document.getElementById("btn-open-notes")?.addEventListener("click", () => this.toggleNotes());
