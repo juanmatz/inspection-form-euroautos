@@ -47,6 +47,7 @@ function generarHtmlReporte(array $vars): string
     $color          = $color          ?? 'N/A';
     $vin            = $vin            ?? 'N/A';
     $aseguradoraEsc = $aseguradoraEsc ?? 'N/A';
+    $severidadEsc   = $severidadEsc   ?? 'N/A';
     $totalPiezas    = (int)($totalPiezas ?? 0);
     $filasHtml      = $filasHtml ?? '<tr class="data-row"><td colspan="4" style="color:#9ca3af;font-style:italic;text-align:center;padding:16px">Sin piezas registradas</td></tr>';
     $obsHtml        = $obsHtml   ?? '<li>Sin observaciones adicionales</li>';
@@ -140,9 +141,9 @@ body {
   border-bottom: 1px solid #D3D8E8;
 }
 
-/* Bordes para la grilla (Fila 1: 4 ítems, Fila 2: 3 ítems, Fila 3: 2 ítems) */
-.hd-item:nth-child(4), .hd-item:nth-child(7), .hd-item:nth-child(9) { border-right: none; }
-.hd-item:nth-child(n+8) { border-bottom: none; }
+/* Bordes para la grilla (Fila 1: 4 \u00edtems, Fila 2: 4 \u00edtems, Fila 3: 2 \u00edtems) */
+.hd-item:nth-child(4), .hd-item:nth-child(8), .hd-item:nth-child(10) { border-right: none; }
+.hd-item:nth-child(n+9) { border-bottom: none; }
 
 /* Asignación de columnas (6 en total) */
 .hd-prop { grid-column: span 2; }
@@ -152,10 +153,24 @@ body {
 
 .hd-col  { grid-column: span 2; }
 .hd-vin  { grid-column: span 2; }
-.hd-aseg { grid-column: span 2; }
+.hd-aseg { grid-column: span 1; }
+.hd-sev  { grid-column: span 1; }
 
 .hd-km   { grid-column: span 3; }
 .hd-ubic { grid-column: span 3; }
+
+/* Severity badge in PDF */
+.sev-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.sev-badge.sev-LEVE   { background: #d4edda; color: #155724; }
+.sev-badge.sev-MEDIO  { background: #fff3cd; color: #856404; }
+.sev-badge.sev-FUERTE { background: #f8d7da; color: #721c24; }
 
 .hd-label {
   font-size: 8px; color: #6b7280;
@@ -341,6 +356,10 @@ body {
     <div class="hd-item hd-aseg">
       <span class="hd-label">Aseguradora</span>
       <span class="hd-value"><?= htmlspecialchars($aseguradoraEsc, ENT_QUOTES) ?></span>
+    </div>
+    <div class="hd-item hd-sev">
+      <span class="hd-label">Estado General</span>
+      <span class="hd-value"><span class="sev-badge sev-<?= htmlspecialchars($severidadEsc, ENT_QUOTES) ?>"><?= htmlspecialchars($severidadEsc, ENT_QUOTES) ?></span></span>
     </div>
     <div class="hd-item hd-km">
       <span class="hd-label">Kilometraje</span>

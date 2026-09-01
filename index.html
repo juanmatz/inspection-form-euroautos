@@ -8,7 +8,7 @@
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
   <title>Inspección Técnica — Euro Autos</title>
-  <link rel="stylesheet" href="app.css?v=4.3.2" />
+  <link rel="stylesheet" href="app.css?v=4.4.0" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 
@@ -296,8 +296,29 @@
             <button class="aseg-btn" id="aseg-Mapfre" data-value="Mapfre">
               <i class="fas fa-building"></i> Mapfre
             </button>
+            <button class="aseg-btn" id="aseg-Sura" data-value="Sura">
+              <i class="fas fa-building"></i> Sura
+            </button>
+            <button class="aseg-btn" id="aseg-Renting" data-value="Renting">
+              <i class="fas fa-building"></i> Renting
+            </button>
             <button class="aseg-btn" id="aseg-Personal" data-value="Personal">
               <i class="fas fa-user"></i> Personal
+            </button>
+          </div>
+        </div>
+
+        <div class="final-field">
+          <label><i class="fas fa-chart-bar"></i> Estado General del Vehículo</label>
+          <div class="severity-bar" id="severity-bar">
+            <button class="severity-btn sev-leve" data-value="LEVE">
+              <i class="fas fa-check-circle"></i> Leve
+            </button>
+            <button class="severity-btn sev-medio" data-value="MEDIO">
+              <i class="fas fa-exclamation-circle"></i> Medio
+            </button>
+            <button class="severity-btn sev-fuerte" data-value="FUERTE">
+              <i class="fas fa-times-circle"></i> Fuerte
             </button>
           </div>
         </div>
@@ -337,10 +358,10 @@
       <button class="sw-close-btn" id="sw-close-btn" title="Cerrar notificación">×</button>
     </div>
   </div>
-
+  
   <div class="toast-container" id="toast-container"></div>
 
-  <script src="app.js?v=4.3.2"></script>
+  <script src="app.js?v=4.4.0"></script>
 </body>
 
 </html>

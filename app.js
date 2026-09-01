@@ -693,7 +693,8 @@ class InspectionApp {
     this.fotos             = [];
     this.existingFotos     = [];
     this.fotoNotes         = {}; // { "filename_or_url": "nota" }
-    this.aseguradora       = null; // Valor seleccionado: Allianz | HDI | Mapfre | Personal
+    this.aseguradora       = null; // Valor seleccionado: Allianz | HDI | Mapfre | Sura | Renting | Personal
+    this.severidad         = null; // Valor seleccionado: LEVE | MEDIO | FUERTE
   }
 
   async init() {
@@ -1072,6 +1073,9 @@ class InspectionApp {
     document.querySelectorAll(".aseg-btn").forEach(btn => {
       btn.classList.toggle("selected", btn.dataset.value === this.aseguradora);
     });
+    document.querySelectorAll(".severity-btn").forEach(btn => {
+      btn.classList.toggle("selected", btn.dataset.value === this.severidad);
+    });
     const errEl = document.getElementById("aseg-error");
     if (errEl) errEl.style.display = "none";
 
@@ -1139,6 +1143,7 @@ class InspectionApp {
       observaciones: document.getElementById("general-notes")?.value || "",
       urls_fotos: existingFotosWithNotes,
       aseguradora: this.aseguradora,
+      severidad: this.severidad,
       kilometraje: this.kilometraje,
       ubicacion: this.ubicacion,
       datos_vehiculo: {
@@ -1157,6 +1162,7 @@ class InspectionApp {
     formData.append("datos", JSON.stringify({ 
       ...payload, 
       aseguradora: this.aseguradora || "",
+      severidad: this.severidad || "",
       kilometraje: this.kilometraje || "",
       ubicacion: this.ubicacion || ""
     }));
@@ -1197,17 +1203,18 @@ class InspectionApp {
 
     const placa = document.getElementById("input-placa")?.value.trim() || "—";
     const aseguradora = this.aseguradora || "N/A";
+    const severidad = this.severidad || "N/A";
 
     if (state === "sending") {
       iconContainer.innerHTML = '<i class="fas fa-paper-plane sw-sending-icon"></i>';
       titleEl.textContent = "Enviando Inspección...";
-      descEl.innerHTML = `<strong>Placa:</strong> ${placa} &nbsp;·&nbsp; <strong>Aseguradora:</strong> ${aseguradora}`;
+      descEl.innerHTML = `<strong>Placa:</strong> ${placa} &nbsp;·&nbsp; <strong>Aseg.:</strong> ${aseguradora} &nbsp;·&nbsp; <strong>Estado:</strong> ${severidad}`;
       btn.style.display = "none";
     } 
     else if (state === "success") {
       iconContainer.innerHTML = '<i class="fas fa-check"></i>';
       titleEl.textContent = "¡Enviado con Éxito!";
-      descEl.innerHTML = `<strong>${placa} (${aseguradora})</strong> — Reporte enviado a Telegram.`;
+      descEl.innerHTML = `<strong>${placa} (${aseguradora} · ${severidad})</strong> — Reporte enviado a Telegram.`;
       // Se oculta el botón "Nueva" a petición del usuario
       btn.style.display = "none";
     } 
@@ -1333,6 +1340,17 @@ class InspectionApp {
       });
     });
 
+    // Botones de severidad
+    document.querySelectorAll(".severity-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        this.severidad = btn.dataset.value;
+        document.querySelectorAll(".severity-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        const errEl = document.getElementById("aseg-error");
+        if (errEl) errEl.style.display = "none";
+      });
+    });
+
     // Botones del modal de ubicación
     document.querySelectorAll(".ubic-btn").forEach(btn => {
       btn.addEventListener("click", () => {
@@ -1344,12 +1362,11 @@ class InspectionApp {
       });
     });
 
-    // Limpiar campos al abrir el modal (opcional, o dejarlos si ya se ingresaron)
-    // Se maneja desde openAseguradoraModal normalmente, pero aquí capturamos:
+    // Confirmar modal de aseguradora — valida todos los campos obligatorios
     document.getElementById("btn-confirm-aseg")?.addEventListener("click", () => {
       const kmInput = document.getElementById("input-kilometraje")?.value.trim();
       
-      if (!this.aseguradora || !this.ubicacion || !kmInput) {
+      if (!this.aseguradora || !this.ubicacion || !kmInput || !this.severidad) {
         const errEl = document.getElementById("aseg-error");
         if (errEl) errEl.style.display = "flex";
         return;

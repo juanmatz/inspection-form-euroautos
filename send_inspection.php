@@ -63,11 +63,15 @@ try {
         $kmVal = ($kmStr !== '') ? intval($kmStr) : null;
         $ubStr = trim($data['ubicacion'] ?? '');
         $ubVal = ($ubStr !== '') ? $ubStr : null;
+        $asegStr = trim($data['aseguradora'] ?? '');
+        $asegVal = ($asegStr !== '') ? $asegStr : null;
+        $sevStr = trim($data['severidad'] ?? '');
+        $sevVal = ($sevStr !== '') ? $sevStr : null;
 
-        // B. Vincular placa, kilometraje y ubicacion a la inspección
-        $sqlInsp = "UPDATE inspecciones SET placa = ?, kilometraje = ?, ubicacion = ? WHERE uid = ?";
+        // B. Vincular placa, kilometraje, ubicacion, aseguradora y severidad a la inspección
+        $sqlInsp = "UPDATE inspecciones SET placa = ?, kilometraje = ?, ubicacion = ?, aseguradora = ?, severidad = ? WHERE uid = ?";
         $stmtI = $conn->prepare($sqlInsp);
-        $stmtI->bind_param("siss", $placa, $kmVal, $ubVal, $uid);
+        $stmtI->bind_param("sissss", $placa, $kmVal, $ubVal, $asegVal, $sevVal, $uid);
         if (!$stmtI->execute()) {
             throw new Exception("Error actualizando inspección: " . $stmtI->error);
         }
@@ -263,6 +267,7 @@ $vehiculo      = $data['datos_vehiculo'] ?? [];
 $piezasRaw     = $data['piezas'] ?? [];
 $observaciones = trim($data['observaciones'] ?? '');
 $aseguradora   = trim($data['aseguradora'] ?? '');
+$severidad     = trim($data['severidad'] ?? '');
 $kilometraje   = trim($data['kilometraje'] ?? '');
 $ubicacion     = trim($data['ubicacion'] ?? '');
 $fechaHoy      = date('d/m/Y');
@@ -378,6 +383,7 @@ $vin            = htmlspecialchars($vehiculo['vin']                ?? 'N/A', ENT
 $propietario    = htmlspecialchars($vehiculo['propietario']        ?? 'N/A', ENT_QUOTES);
 $cedula         = htmlspecialchars($vehiculo['cedula_propietario'] ?? 'N/A', ENT_QUOTES);
 $aseguradoraEsc = htmlspecialchars($aseguradora ?: 'N/A',           ENT_QUOTES);
+$severidadEsc   = htmlspecialchars($severidad ?: 'N/A',             ENT_QUOTES);
 $kilometrajeEsc = htmlspecialchars($kilometraje ?: 'N/A',           ENT_QUOTES);
 $ubicacionEsc   = htmlspecialchars($ubicacion ?: 'N/A',             ENT_QUOTES);
 
@@ -393,6 +399,7 @@ $htmlReporte = generarHtmlReporte([
     'color'          => $color,
     'vin'            => $vin,
     'aseguradoraEsc' => $aseguradoraEsc,
+    'severidadEsc'   => $severidadEsc,
     'kilometrajeEsc' => $kilometrajeEsc,
     'ubicacionEsc'   => $ubicacionEsc,
     'totalPiezas'    => $totalPiezas,
@@ -472,6 +479,7 @@ $n8nPayload = json_encode([
     'pdf_url'       => $pdf_url,
     'urls_fotos'    => $urls_fotos,
     'aseguradora'   => $aseguradora,
+    'severidad'     => $severidad,
     'kilometraje'   => $kilometraje,
     'ubicacion'     => $ubicacion,
     'datos_vehiculo'=> $data['datos_vehiculo'] ?? [],
